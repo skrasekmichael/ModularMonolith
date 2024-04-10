@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\TeamUp.Common.Domain\TeamUp.Common.Domain.csproj" />
+    <ProjectReference Include="..\TeamUp.UserAccess.Contracts\TeamUp.UserAccess.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

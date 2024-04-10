@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NetArchTest.Rules" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Common\TeamUp.Common.Application\TeamUp.Common.Application.csproj" />
+    <ProjectReference Include="..\..\src\Common\TeamUp.Common.Contracts\TeamUp.Common.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Common\TeamUp.Common.Domain\TeamUp.Common.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Common\TeamUp.Common.Endpoints\TeamUp.Common.Endpoints.csproj" />
+    <ProjectReference Include="..\..\src\Common\TeamUp.Common.Infrastructure\TeamUp.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\UserAccess\TeamUp.UserAccess.Infrastructure\TeamUp.UserAccess.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\TeamUp.Bootstrapper\TeamUp.Bootstrapper.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
