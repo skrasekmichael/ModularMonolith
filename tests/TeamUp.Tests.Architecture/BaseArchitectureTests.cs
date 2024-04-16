@@ -3,10 +3,11 @@
 using TeamUp.Common.Application;
 using TeamUp.Common.Domain;
 using TeamUp.Common.Endpoints;
-using TeamUp.Common.Infrastructure;
+using TeamUp.Common.Infrastructure.Modules;
+using TeamUp.Common.Infrastructure.Processing;
 using TeamUp.Domain.Abstractions;
 using TeamUp.Tests.Architecture.Extensions;
-using TeamUp.UserAccess.Infrastructure;
+using TeamUp.Tests.Common;
 
 namespace TeamUp.Tests.Architecture;
 
@@ -18,13 +19,13 @@ public abstract class BaseArchitectureTests
 	public const string DOMAIN_LAYER = ".Domain";
 	public const string ENDPOINTS_LAYER = ".Endpoints";
 
-	public static readonly Assembly BootstrapperAssembly = Assembly.GetAssembly(typeof(Program))!;
+	public static readonly Assembly BootstrapperAssembly = typeof(Program).Assembly;
 
-	public static readonly Assembly CommonApplicationAssembly = Assembly.GetAssembly(typeof(IIntegrationEventHandler))!;
-	public static readonly Assembly CommonContractsAssembly = Assembly.GetAssembly(typeof(IIntegrationEvent))!;
-	public static readonly Assembly CommonDomainAssembly = Assembly.GetAssembly(typeof(IDomainEvent))!;
-	public static readonly Assembly CommonEndpointsAssembly = Assembly.GetAssembly(typeof(IEndpointGroup))!;
-	public static readonly Assembly CommonInfrastructureAssembly = Assembly.GetAssembly(typeof(BaseModule))!;
+	public static readonly Assembly CommonApplicationAssembly = typeof(IIntegrationEventHandler<>).Assembly;
+	public static readonly Assembly CommonContractsAssembly = typeof(IIntegrationEvent).Assembly;
+	public static readonly Assembly CommonDomainAssembly = typeof(IDomainEvent).Assembly;
+	public static readonly Assembly CommonEndpointsAssembly = typeof(IEndpointGroup).Assembly;
+	public static readonly Assembly CommonInfrastructureAssembly = typeof(IModule).Assembly;
 
 	public static readonly Assembly[] CommonAssemblies = [
 		CommonApplicationAssembly,
@@ -34,9 +35,7 @@ public abstract class BaseArchitectureTests
 		CommonInfrastructureAssembly
 	];
 
-	public static readonly BaseModule[] Modules = [
-		new UserAccessModule()
-	];
+	public static IModule[] Modules => ModulesAccessor.Modules;
 
 	public static Assembly[] GetAllAssemblies()
 	{

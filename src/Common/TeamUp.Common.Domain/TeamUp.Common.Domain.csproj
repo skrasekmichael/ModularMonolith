@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="MassTransit" />
     <PackageReference Include="MediatR" />
+    <PackageReference Include="Skrasek.RailwayResult.FunctionalExtensions" />
   </ItemGroup>
 
   <ItemGroup>

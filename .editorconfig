@@ -396,5 +396,8 @@ dotnet_style_allow_statement_immediately_after_block_experimental = true:silent
 dotnet_diagnostic.IDE0055.severity = error
 dotnet_style_prefer_collection_expression = true:suggestion
 
-[src/TeamUp.Infrastructure/Persistence/Migrations/**.cs]
+[src/Modules/*/TeamUp.*.Infrastructure/Persistence/Migrations/**.cs]
+generated_code = true
+
+[src/Common/TeamUp.Common.Infrastructure/Persistence/Migrations/**.cs]
 generated_code = true

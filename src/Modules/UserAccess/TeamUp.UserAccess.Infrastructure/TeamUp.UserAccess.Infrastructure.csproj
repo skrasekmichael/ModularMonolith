@@ -1,10 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Common\TeamUp.Common.Infrastructure\TeamUp.Common.Infrastructure.csproj" />
     <ProjectReference Include="..\TeamUp.UserAccess.Application\TeamUp.UserAccess.Application.csproj" />
     <ProjectReference Include="..\TeamUp.UserAccess.Contracts\TeamUp.UserAccess.Contracts.csproj" />
     <ProjectReference Include="..\TeamUp.UserAccess.Domain\TeamUp.UserAccess.Domain.csproj" />
+    <ProjectReference Include="..\TeamUp.UserAccess.Endpoints\TeamUp.UserAccess.Endpoints.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Http" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
@@ -10,6 +11,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\TeamUp.Common.Endpoints\TeamUp.Common.Endpoints.csproj" />
     <ProjectReference Include="..\Common\TeamUp.Common.Infrastructure\TeamUp.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\TeamManagement\TeamUp.TeamManagement.Endpoints\TeamUp.TeamManagement.Endpoints.csproj" />
+    <ProjectReference Include="..\Modules\TeamManagement\TeamUp.TeamManagement.Infrastructure\TeamUp.TeamManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\UserAccess\TeamUp.UserAccess.Endpoints\TeamUp.UserAccess.Endpoints.csproj" />
     <ProjectReference Include="..\Modules\UserAccess\TeamUp.UserAccess.Infrastructure\TeamUp.UserAccess.Infrastructure.csproj" />
   </ItemGroup>

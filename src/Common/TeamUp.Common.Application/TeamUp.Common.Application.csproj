@@ -1,5 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\TeamUp.Common.Contracts\TeamUp.Common.Contracts.csproj" />
   </ItemGroup>
+  
 </Project>

@@ -5,14 +5,14 @@ using FluentAssertions;
 
 using NetArchTest.Rules;
 
-using TeamUp.Common.Infrastructure;
+using TeamUp.Common.Infrastructure.Modules;
 using TeamUp.Tests.Architecture.Extensions;
 
 namespace TeamUp.Tests.Architecture.DependencyTests;
 
 public sealed class ModuleDependencyTests : BaseArchitectureTests
 {
-	public static TheoryData<BaseModule> ModulesData => new(Modules);
+	public static TheoryData<IModule> ModulesData => new(Modules);
 
 	private static readonly string[] AllowedLayerNames = [
 		ENDPOINTS_LAYER,
@@ -27,7 +27,7 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 
 	[Theory]
 	[MemberData(nameof(ModulesData))]
-	public void EachModulesLayer_Should_FollowNamingConvention(BaseModule module)
+	public void EachModulesLayer_Should_FollowNamingConvention(IModule module)
 	{
 		var failingLayers = new List<Assembly>();
 
@@ -45,18 +45,17 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 
 	[Theory]
 	[MemberData(nameof(ModulesData))]
-	public void EachModulesApplicationLayer_Should_DependOnlyOn_CommonApplication_Or_Domain_Or_ContractsOfModules(BaseModule module)
+	public void EachModulesApplicationLayer_Should_DependOnlyOn_CommonApplication_Or_CommonDomain_Or_Domain_Or_ContractsOfModules(IModule module)
 	{
 		var assemblies = GetAllAssemblies();
 		var applicationAssembly = module.GetLayer(APPLICATION_LAYER);
 
-		var allowedAssemblies = new List<Assembly>()
-		{
+		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).Concat([
 			applicationAssembly,
+			CommonDomainAssembly,
 			CommonApplicationAssembly,
 			module.GetLayer(DOMAIN_LAYER)
-		};
-		allowedAssemblies.AddRange(Modules.GetLayerAssemblies(CONTRACTS_LAYER));
+		]);
 
 		var failingTypes = Types.InAssembly(applicationAssembly)
 			.That()
@@ -68,17 +67,16 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 
 	[Theory]
 	[MemberData(nameof(ModulesData))]
-	public void EachModulesDomainLayer_Should_DependOnlyOn_CommonDomain_Or_ContractsOfModules(BaseModule module)
+	public void EachModulesDomainLayer_Should_DependOnlyOn_CommonDomain_Or_CommonContracts_Or_ContractsOfModules(IModule module)
 	{
 		var assemblies = GetAllAssemblies();
 		var domainAssembly = module.GetLayer(DOMAIN_LAYER);
 
-		var allowedAssemblies = new List<Assembly>()
-		{
+		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).Concat([
 			domainAssembly,
-			CommonDomainAssembly
-		};
-		allowedAssemblies.AddRange(Modules.GetLayerAssemblies(CONTRACTS_LAYER));
+			CommonDomainAssembly,
+			CommonContractsAssembly
+		]);
 
 		var failingTypes = Types.InAssembly(domainAssembly)
 			.That()
@@ -90,7 +88,7 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 
 	[Theory]
 	[MemberData(nameof(ModulesData))]
-	public void EachModulesContractsLayer_Should_DependOnlyOn_CommonContracts(BaseModule module)
+	public void EachModulesContractsLayer_Should_DependOnlyOn_CommonContracts(IModule module)
 	{
 		var assemblies = GetAllAssemblies();
 		var contractsAssembly = module.GetLayer(CONTRACTS_LAYER);
@@ -111,18 +109,16 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 
 	[Theory]
 	[MemberData(nameof(ModulesData))]
-	public void EachModulesInfrastructureLayer_Should_DependOnlyOn_CommonInfrastructure_Or_Domain_Or_Application(BaseModule module)
+	public void EachModulesInfrastructureLayer_Should_DependOnlyOn_CommonInfrastructure_Or_CommonDomain_Or_CommonContracts_Or_ModulesAssemblies_Or_ContractsOfModules(IModule module)
 	{
 		var assemblies = GetAllAssemblies();
 		var infrastructureAssembly = module.GetLayer(INFRASTRUCTURE_LAYER);
 
-		var allowedAssemblies = new Assembly[]
-		{
-			infrastructureAssembly,
+		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).Concat([
 			CommonInfrastructureAssembly,
-			module.GetLayer(DOMAIN_LAYER),
-			module.GetLayer(APPLICATION_LAYER)
-		};
+			CommonDomainAssembly,
+			CommonContractsAssembly,
+		]).Concat(module.Assemblies);
 
 		var failingTypes = Types.InAssembly(infrastructureAssembly)
 			.That()
@@ -134,7 +130,7 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 
 	[Theory]
 	[MemberData(nameof(ModulesData))]
-	public void EachModulesEndpointsLayer_Should_DependOnlyOn_CommonEndpoints_Or_Contracts(BaseModule module)
+	public void EachModulesEndpointsLayer_Should_DependOnlyOn_CommonEndpoints_Or_Contracts(IModule module)
 	{
 		var assemblies = GetAllAssemblies();
 		var endpointsAssembly = module.GetLayer(ENDPOINTS_LAYER);

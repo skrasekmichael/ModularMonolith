@@ -47,13 +47,21 @@ public sealed class BuildingBlocksDependencyTests : BaseArchitectureTests
 	}
 
 	[Fact]
-	public void CommonInfrastructure_Should_HaveNoDependency()
+	public void CommonInfrastructure_Should_DependOnlyOn_CommonDomain_And_CommonApplication_And_CommonContracts()
 	{
 		var assemblies = GetAllAssemblies();
 
+		var allowedAssemblies = new List<Assembly>()
+		{
+			CommonDomainAssembly,
+			CommonApplicationAssembly,
+			CommonContractsAssembly,
+			CommonInfrastructureAssembly
+		};
+
 		var failingTypes = Types.InAssembly(CommonInfrastructureAssembly)
 			.That()
-			.HaveDependencyOnAny(assemblies.Except([CommonInfrastructureAssembly]).ToNames())
+			.HaveDependencyOnAny(assemblies.Except(allowedAssemblies).ToNames())
 			.GetTypes();
 
 		failingTypes.Should().BeEmpty();

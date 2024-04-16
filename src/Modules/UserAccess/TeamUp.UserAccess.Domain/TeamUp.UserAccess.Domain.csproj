@@ -5,4 +5,10 @@
     <ProjectReference Include="..\TeamUp.UserAccess.Contracts\TeamUp.UserAccess.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="RailwayResult" />
+    <Using Include="RailwayResult.Errors" />
+    <Using Include="RailwayResult.FunctionalExtensions" />
+  </ItemGroup>
+
 </Project>

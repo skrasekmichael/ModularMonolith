@@ -1,14 +1,15 @@
 ﻿using Asp.Versioning;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
-using TeamUp.Common.Infrastructure;
+using TeamUp.Bootstrapper.Security;
 
 namespace TeamUp.Bootstrapper;
 
 public static class ServiceCollectionExtensions
 {
-	public static IServiceCollection AddVersioning(this IServiceCollection services)
+	public static IServiceCollection AddRestApiVersioning(this IServiceCollection services)
 	{
 		services.AddApiVersioning(options =>
 		{
@@ -61,12 +62,20 @@ public static class ServiceCollectionExtensions
 		return services;
 	}
 
-	public static IServiceCollection AddModule<TModule>(this IServiceCollection services) where TModule : BaseModule, new()
+	public static IServiceCollection AddSecurity(this IServiceCollection services)
 	{
-		var module = new TModule();
+		services.AddCors();
+		services.ConfigureOptions<ConfigureCorsOptions>();
 
-		module.ConfigureService(services);
-		module.ConfigureHealthChecks(services.AddHealthChecks());
+		services.AddAuthentication(options =>
+		{
+			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+		}).AddJwtBearer();
+		services.ConfigureOptions<ConfigureJwtBearerOptions>();
+
+		services.AddAuthorization();
 
 		return services;
 	}

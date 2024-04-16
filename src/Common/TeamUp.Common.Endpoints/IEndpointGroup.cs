@@ -4,5 +4,5 @@ namespace TeamUp.Common.Endpoints;
 
 public interface IEndpointGroup
 {
-	public void MapEndpoints(RouteGroupBuilder group);
+	public RouteGroupBuilder MapEndpoints(RouteGroupBuilder group);
 }

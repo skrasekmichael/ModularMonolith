@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR.Contracts" />
+    <PackageReference Include="Skrasek.RailwayResult" />
+    <PackageReference Include="Skrasek.RailwayResult.Errors" />
   </ItemGroup>
 
 </Project>

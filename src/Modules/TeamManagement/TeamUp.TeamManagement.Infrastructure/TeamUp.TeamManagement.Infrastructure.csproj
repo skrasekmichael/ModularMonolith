@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\TeamUp.Common.Infrastructure\TeamUp.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\TeamUp.TeamManagement.Application\TeamUp.TeamManagement.Application.csproj" />
+    <ProjectReference Include="..\TeamUp.TeamManagement.Contracts\TeamUp.TeamManagement.Contracts.csproj" />
+    <ProjectReference Include="..\TeamUp.TeamManagement.Domain\TeamUp.TeamManagement.Domain.csproj" />
+    <ProjectReference Include="..\TeamUp.TeamManagement.Endpoints\TeamUp.TeamManagement.Endpoints.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -4,9 +4,12 @@ using TeamUp.Common.Endpoints;
 
 namespace TeamUp.UserAccess.Endpoints;
 
-public class UserAccessEndpointGroup : IEndpointGroup
+public sealed class UserAccessEndpointGroup() : EndpointGroup("users")
 {
-	public void MapEndpoints(RouteGroupBuilder group)
+	public override void Map(RouteGroupBuilder group)
 	{
+		group.MapEndpoint<GetMyAccountEndpoint>()
+			.MapEndpoint<RegisterUserEndpoint>()
+			.MapEndpoint<LoginEndpoint>();
 	}
 }

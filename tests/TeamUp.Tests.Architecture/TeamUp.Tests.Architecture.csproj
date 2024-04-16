@@ -7,11 +7,17 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="NetArchTest.Rules" />
     <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -20,8 +26,10 @@
     <ProjectReference Include="..\..\src\Common\TeamUp.Common.Domain\TeamUp.Common.Domain.csproj" />
     <ProjectReference Include="..\..\src\Common\TeamUp.Common.Endpoints\TeamUp.Common.Endpoints.csproj" />
     <ProjectReference Include="..\..\src\Common\TeamUp.Common.Infrastructure\TeamUp.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\TeamManagement\TeamUp.TeamManagement.Infrastructure\TeamUp.TeamManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Modules\UserAccess\TeamUp.UserAccess.Infrastructure\TeamUp.UserAccess.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\TeamUp.Bootstrapper\TeamUp.Bootstrapper.csproj" />
+    <ProjectReference Include="..\TeamUp.Tests.Common\TeamUp.Tests.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

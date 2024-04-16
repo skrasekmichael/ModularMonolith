@@ -1,5 +1,3 @@
-﻿using MediatR;
+﻿namespace TeamUp.Domain.Abstractions;
 
-namespace TeamUp.Domain.Abstractions;
-
-public interface IIntegrationEvent : INotification;
+public interface IIntegrationEvent;

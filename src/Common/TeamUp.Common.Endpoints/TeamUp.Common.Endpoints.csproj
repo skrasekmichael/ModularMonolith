@@ -3,6 +3,10 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Http" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TeamUp.Common.Contracts\TeamUp.Common.Contracts.csproj" />
