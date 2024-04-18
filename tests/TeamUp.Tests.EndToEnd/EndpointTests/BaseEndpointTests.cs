@@ -19,7 +19,9 @@ public abstract class BaseEndpointTests(AppFixture app) : IAsyncLifetime
 
 	protected AppFixture App { get; } = app;
 	protected HttpClient Client { get; private set; } = null!;
+
 	internal SkewDateTimeProvider DateTimeProvider { get; private set; } = null!;
+	internal MailInbox Inbox { get; private set; } = null!;
 
 	public async Task InitializeAsync()
 	{
@@ -29,9 +31,12 @@ public abstract class BaseEndpointTests(AppFixture app) : IAsyncLifetime
 		Client.BaseAddress = new Uri($"https://{Client.BaseAddress!.Host}:{App.HttpsPort}");
 
 		DateTimeProvider = (SkewDateTimeProvider)App.Services.GetRequiredService<IDateTimeProvider>();
+		Inbox = App.Services.GetRequiredService<MailInbox>();
 
 		DateTimeProvider.Skew = TimeSpan.Zero;
 		DateTimeProvider.ExactTime = null;
+
+		Inbox.Clear();
 	}
 
 	public void Authenticate(User user)

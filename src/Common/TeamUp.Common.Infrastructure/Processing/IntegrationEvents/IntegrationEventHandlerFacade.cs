@@ -46,12 +46,16 @@ internal sealed class IntegrationEventHandlerFacade<THandler, TIntegrationEvent>
 			if (result is { Error: ConcurrencyError or InternalError })
 			{
 				//this errors may be resolved by retrying to consume the event
-				_logger.LogCritical("Failed to consume integration event {eventData}.", context.Message);
+				_logger.LogCritical("Failed to consume integration event {eventData} by {consumer}.", context.Message, typeof(THandler).FullName);
 				throw new RetryToConsumeIntegrationEventException(result.Error);
 			}
 
 			//probably bug, discard event
-			_logger.LogWarning("Failed to consume integration event {eventData}, error {error} occurred.", context.Message, result.Error);
+			_logger.LogWarning("Failed to consume integration event {eventData} by {consumer}.\nError {error} occurred.", context.Message, typeof(THandler).FullName, result.Error);
+		}
+		else
+		{
+			_logger.LogInformation("Event {event} consumed successfully by {consumer}", typeof(TIntegrationEvent).Name, typeof(THandler).FullName);
 		}
 	}
 

@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="MailKit" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\TeamUp.Common.Infrastructure\TeamUp.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\TeamUp.Notifications.Application\TeamUp.Notifications.Application.csproj" />
+    <ProjectReference Include="..\TeamUp.Notifications.Contracts\TeamUp.Notifications.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -62,8 +62,7 @@ public abstract class Module : IModule
 				continue;
 			}
 
-			var commandInterface = type.GetInterfaceWithGenericDefinition(CommandType);
-			if (commandInterface is not null)
+			if (type.ImplementInterfaceOfType(CommandType))
 			{
 				var consumerType = CommandConsumerType.MakeGenericType(type);
 				cfg.AddConsumer(consumerType);

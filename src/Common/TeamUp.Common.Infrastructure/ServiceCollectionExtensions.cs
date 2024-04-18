@@ -3,7 +3,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using TeamUp.Common.Contracts;
-using TeamUp.Common.Infrastructure.Extensions;
 using TeamUp.Common.Infrastructure.Modules;
 using TeamUp.Common.Infrastructure.Options;
 using TeamUp.Common.Infrastructure.Persistence;

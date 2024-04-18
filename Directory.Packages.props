@@ -40,9 +40,9 @@
     <PackageVersion Include="RabbitMQ.Client" Version="6.8.1" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
     <PackageVersion Include="Riok.Mapperly" Version="3.3.0" />
-    <PackageVersion Include="Skrasek.RailwayResult" Version="1.0.4" />
-    <PackageVersion Include="Skrasek.RailwayResult.Errors" Version="1.0.4" />
-    <PackageVersion Include="Skrasek.RailwayResult.FunctionalExtensions" Version="1.0.4" />
+    <PackageVersion Include="Skrasek.RailwayResult" Version="1.1.0" />
+    <PackageVersion Include="Skrasek.RailwayResult.Errors" Version="1.1.0" />
+    <PackageVersion Include="Skrasek.RailwayResult.FunctionalExtensions" Version="1.1.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.1.2" />
     <PackageVersion Include="Testcontainers" Version="3.8.0" />

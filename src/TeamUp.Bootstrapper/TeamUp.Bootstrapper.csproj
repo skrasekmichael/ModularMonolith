@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\TeamUp.Common.Endpoints\TeamUp.Common.Endpoints.csproj" />
     <ProjectReference Include="..\Common\TeamUp.Common.Infrastructure\TeamUp.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Notifications\TeamUp.Notifications.Infrastructure\TeamUp.Notifications.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\TeamManagement\TeamUp.TeamManagement.Endpoints\TeamUp.TeamManagement.Endpoints.csproj" />
     <ProjectReference Include="..\Modules\TeamManagement\TeamUp.TeamManagement.Infrastructure\TeamUp.TeamManagement.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\UserAccess\TeamUp.UserAccess.Endpoints\TeamUp.UserAccess.Endpoints.csproj" />

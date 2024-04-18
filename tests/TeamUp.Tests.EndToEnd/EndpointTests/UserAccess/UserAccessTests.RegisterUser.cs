@@ -37,7 +37,6 @@ public sealed class RegisterUserTests(AppFixture app) : UserAccessTests(app)
 			user.Password.Should().NotBeEquivalentTo(request.Password);
 		});
 
-
 		await WaitForIntegrationEventsAsync();
 
 		await UseDbContextAsync<TeamManagementDbContext>(async dbContext =>
@@ -50,7 +49,9 @@ public sealed class RegisterUserTests(AppFixture app) : UserAccessTests(app)
 			user.NumberOfOwnedTeams.Should().Be(0);
 		});
 
-		//TODO check email
+		await Task.Delay(60_000);
+
+		Inbox.Should().Contain(email => email.EmailAddress == request.Email);
 	}
 
 	[Fact]

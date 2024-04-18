@@ -1,0 +1,6 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\TeamUp.Common.Application\TeamUp.Common.Application.csproj" />
+    <ProjectReference Include="..\TeamUp.Notifications.Contracts\TeamUp.Notifications.Contracts.csproj" />
+  </ItemGroup>
+</Project>

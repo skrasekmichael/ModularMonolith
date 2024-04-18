@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using TeamUp.Common.Contracts;
 using TeamUp.Common.Infrastructure.Services;
+using TeamUp.Notifications.Application;
 
 namespace TeamUp.Tests.EndToEnd;
 
@@ -25,6 +27,10 @@ public sealed class AppFactory(string connectionString) : WebApplicationFactory<
 
 			//date time provider
 			services.Replace<IDateTimeProvider, SkewDateTimeProvider>();
+
+			//email service
+			services.AddSingleton<MailInbox>();
+			services.Replace<IEmailSender, EmailSender>();
 		});
 
 		builder.UseEnvironment(Environments.Production);

@@ -3,6 +3,7 @@ using TeamUp.Bootstrapper.Middlewares;
 using TeamUp.Common.Endpoints;
 using TeamUp.Common.Infrastructure;
 using TeamUp.Common.Infrastructure.Extensions;
+using TeamUp.Notifications.Infrastructure;
 using TeamUp.TeamManagement.Infrastructure;
 using TeamUp.UserAccess.Endpoints;
 using TeamUp.UserAccess.Infrastructure;
@@ -22,6 +23,7 @@ var modules = builder.Services.AddInfrastructure(config =>
 {
 	config.AddModule<UserAccessModule>();
 	config.AddModule<TeamManagementModule>();
+	config.AddModule<NotificationsModule>();
 });
 
 var app = builder.Build();
