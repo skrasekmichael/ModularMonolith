@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-using TeamUp.Common.Application;
+﻿using TeamUp.Common.Application;
 using TeamUp.UserAccess.Application.Abstractions;
 using TeamUp.UserAccess.Contracts;
 using TeamUp.UserAccess.Contracts.CreateUser;
@@ -12,12 +10,12 @@ internal sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserC
 {
 	private readonly UserFactory _userFactory;
 	private readonly IPasswordService _passwordService;
-	private readonly IUnitOfWork _unitOfWork;
+	private readonly IUnitOfWork<UserAccessModuleId> _unitOfWork;
 
 	public RegisterUserCommandHandler(
 		UserFactory userFactory,
 		IPasswordService passwordService,
-		[FromKeyedServices(Constants.MODULE_NAME)] IUnitOfWork unitOfWork)
+		IUnitOfWork<UserAccessModuleId> unitOfWork)
 	{
 		_userFactory = userFactory;
 		_passwordService = passwordService;

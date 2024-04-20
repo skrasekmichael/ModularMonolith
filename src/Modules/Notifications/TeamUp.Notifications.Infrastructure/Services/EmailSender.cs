@@ -8,7 +8,7 @@ using MimeKit;
 using RailwayResult;
 using RailwayResult.Errors;
 
-using TeamUp.Notifications.Application;
+using TeamUp.Notifications.Application.Email;
 
 namespace TeamUp.Notifications.Infrastructure.Services;
 

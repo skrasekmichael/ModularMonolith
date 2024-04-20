@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using TeamUp.Common.Endpoints;
 
-using TeamUp.Common.Endpoints;
+namespace TeamUp.TeamManagement.Endpoints;
 
-namespace TeamUp.UserAccess.Endpoints;
-
-public sealed class TeamManagementEndpointGroup : ComplexEndpointGroup
+public sealed class TeamManagementEndpointGroup : IEndpointGroup
 {
-	public override IEndpointGroup[] GetEndpointGroups() => [
-
-	];
+	public EndpointGroupBuilder MapEndpoints(EndpointGroupBuilder group)
+	{
+		return group
+			.MapGroup<TeamEndpoints>()
+			.MapGroup<InvitationEndpoints>();
+	}
 }

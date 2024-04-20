@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 using RailwayResult;
 
-using TeamUp.Application.Abstractions;
+using TeamUp.Common.Contracts;
 using TeamUp.Common.Contracts.Errors;
 
 namespace TeamUp.Common.Infrastructure.Processing.Queries;

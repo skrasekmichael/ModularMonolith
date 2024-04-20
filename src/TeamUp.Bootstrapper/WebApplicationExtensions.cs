@@ -1,10 +1,12 @@
 ﻿using Asp.Versioning;
 
+using TeamUp.Common.Infrastructure.Modules;
+
 namespace TeamUp.Bootstrapper;
 
 public static class WebApplicationExtensions
 {
-	public static void MapEndpoints(this WebApplication app, Action<RouteGroupBuilder> mapper)
+	public static void MapEndpoints(this WebApplication app, IEnumerable<IModule> modules)
 	{
 		var apiVersionSet = app
 			.NewApiVersionSet()
@@ -17,6 +19,9 @@ public static class WebApplicationExtensions
 			.WithApiVersionSet(apiVersionSet)
 			.WithOpenApi();
 
-		mapper(apiGroup);
+		foreach (var module in modules.OfType<IModuleWithEndpoints>())
+		{
+			module.MapEndpoints(apiGroup);
+		}
 	}
 }

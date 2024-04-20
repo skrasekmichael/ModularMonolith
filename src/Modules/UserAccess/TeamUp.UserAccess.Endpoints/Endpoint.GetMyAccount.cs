@@ -23,7 +23,10 @@ internal sealed class GetMyAccountEndpoint : IEndpoint
 			.RequireAuthorization();
 	}
 
-	private async Task<IResult> GetAccountDetailsAsync([FromServices] ISender sender, HttpContext httpContext, CancellationToken ct)
+	private async Task<IResult> GetAccountDetailsAsync(
+		[FromServices] ISender sender,
+		HttpContext httpContext,
+		CancellationToken ct)
 	{
 		var query = new GetAccountDetailsQuery
 		{

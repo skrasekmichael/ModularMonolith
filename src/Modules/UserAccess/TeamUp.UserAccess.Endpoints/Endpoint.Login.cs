@@ -22,7 +22,10 @@ internal sealed class LoginEndpoint : IEndpoint
 			.MapToApiVersion(1);
 	}
 
-	private async Task<IResult> LoginAsync([FromBody] LoginRequest request, [FromServices] ISender sender, CancellationToken ct)
+	private async Task<IResult> LoginAsync(
+		[FromBody] LoginRequest request,
+		[FromServices] ISender sender,
+		CancellationToken ct)
 	{
 		var command = new LoginCommand
 		{

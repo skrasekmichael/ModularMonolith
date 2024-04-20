@@ -6,6 +6,7 @@
   
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Http" />
+    <PackageReference Include="MediatR" />
   </ItemGroup>
 
   <ItemGroup>

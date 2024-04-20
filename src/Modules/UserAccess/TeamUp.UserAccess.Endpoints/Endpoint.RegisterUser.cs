@@ -25,8 +25,8 @@ internal sealed class RegisterUserEndpoint : IEndpoint
 
 	private async Task<IResult> RegisterUserAsync(
 		[FromBody] RegisterUserRequest request,
-		[FromServices] ISender sender,
 		[FromServices] LinkGenerator linkGenerator,
+		[FromServices] ISender sender,
 		HttpContext httpContext,
 		CancellationToken ct)
 	{

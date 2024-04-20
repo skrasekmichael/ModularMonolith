@@ -1,11 +1,9 @@
 using TeamUp.Bootstrapper;
 using TeamUp.Bootstrapper.Middlewares;
-using TeamUp.Common.Endpoints;
 using TeamUp.Common.Infrastructure;
 using TeamUp.Common.Infrastructure.Extensions;
 using TeamUp.Notifications.Infrastructure;
 using TeamUp.TeamManagement.Infrastructure;
-using TeamUp.UserAccess.Endpoints;
 using TeamUp.UserAccess.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,13 +15,15 @@ builder.Services
 	.AddEndpointsApiExplorer()
 	.AddRestApiVersioning()
 	.AddSwagger()
-	.AddSecurity();
+	.AddSecurity()
+	.AddInfrastructure();
 
-var modules = builder.Services.AddInfrastructure(config =>
+var modules = builder.Services.AddModules(builder =>
 {
-	config.AddModule<UserAccessModule>();
-	config.AddModule<TeamManagementModule>();
-	config.AddModule<NotificationsModule>();
+	builder
+		.AddModule<UserAccessModule>()
+		.AddModule<TeamManagementModule>()
+		.AddModule<NotificationsModule>();
 });
 
 var app = builder.Build();
@@ -50,11 +50,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHealthChecks("/_health");
-app.MapEndpoints(group =>
-{
-	group.MapEndpointGroup<UserAccessEndpointGroup>();
-	group.MapEndpointGroup<TeamManagementEndpointGroup>();
-});
+app.MapEndpoints(modules);
 
 app.Run();
 

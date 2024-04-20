@@ -1,6 +1,6 @@
 ﻿using RailwayResult;
 
-using TeamUp.Notifications.Application;
+using TeamUp.Notifications.Application.Email;
 
 namespace TeamUp.Tests.EndToEnd.Mocks;
 

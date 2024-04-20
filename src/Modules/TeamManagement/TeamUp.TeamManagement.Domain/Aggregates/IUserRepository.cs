@@ -1,7 +1,6 @@
-﻿using TeamUp.TeamManagement.Domain.Aggregates;
-using TeamUp.UserAccess.Contracts;
+﻿using TeamUp.UserAccess.Contracts;
 
-namespace TeamUp.Domain.Aggregates.Users;
+namespace TeamUp.TeamManagement.Domain.Aggregates;
 
 public interface IUserRepository
 {

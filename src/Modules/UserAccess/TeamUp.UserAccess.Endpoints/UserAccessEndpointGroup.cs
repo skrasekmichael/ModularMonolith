@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Routing;
-
-using TeamUp.Common.Endpoints;
+﻿using TeamUp.Common.Endpoints;
 
 namespace TeamUp.UserAccess.Endpoints;
 
-public sealed class UserAccessEndpointGroup() : EndpointGroup("users")
+public sealed class UserAccessEndpointGroup : IEndpointGroup
 {
-	public override void Map(RouteGroupBuilder group)
+	public EndpointGroupBuilder MapEndpoints(EndpointGroupBuilder group)
 	{
-		group.MapEndpoint<GetMyAccountEndpoint>()
-			.MapEndpoint<RegisterUserEndpoint>()
-			.MapEndpoint<LoginEndpoint>();
+		return group.CreateGroup("users", group =>
+		{
+			group
+				.AddEndpoint<GetMyAccountEndpoint>()
+				.AddEndpoint<RegisterUserEndpoint>()
+				.AddEndpoint<LoginEndpoint>();
+		});
 	}
 }

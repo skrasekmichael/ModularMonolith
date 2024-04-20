@@ -2,8 +2,6 @@
 
 public static class Constants
 {
-	public const string MODULE_NAME = "TeamManagement";
-
 	public const int TEAM_NAME_MIN_SIZE = 3;
 	public const int TEAM_NAME_MAX_SIZE = 30;
 

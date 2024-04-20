@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+
+using TeamUp.Common.Contracts;
 
 namespace TeamUp.Common.Infrastructure.Persistence;
 
-public abstract class DesignTimeDatabaseContextFactory<TDatabaseContext> : IDesignTimeDbContextFactory<TDatabaseContext> where TDatabaseContext : DbContext, IDatabaseContext
+public abstract class DesignTimeDatabaseContextFactory<TDatabaseContext, TModuleId> : IDesignTimeDbContextFactory<TDatabaseContext>
+	where TDatabaseContext : DbContext, IDatabaseContext<TModuleId>
+	where TModuleId : IModuleId
 {
-	public TDatabaseContext CreateDbContext(string[] args) => DatabaseUtils.CreateDatabaseContext<TDatabaseContext>("");
+	public TDatabaseContext CreateDbContext(string[] args) => DatabaseUtils.CreateDatabaseContext<TDatabaseContext, TModuleId>("");
 }

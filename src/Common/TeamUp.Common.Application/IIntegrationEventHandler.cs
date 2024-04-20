@@ -1,10 +1,12 @@
 ﻿using RailwayResult;
 
-using TeamUp.Domain.Abstractions;
+using TeamUp.Common.Contracts;
 
 namespace TeamUp.Common.Application;
 
-public interface IIntegrationEventHandler<TIntegrationEvent> where TIntegrationEvent : class, IIntegrationEvent
+public interface IIntegrationEventHandlerMarker;
+
+public interface IIntegrationEventHandler<TIntegrationEvent> : IIntegrationEventHandlerMarker where TIntegrationEvent : class, IIntegrationEvent
 {
 	public Task<Result> Handle(TIntegrationEvent integrationEvent, CancellationToken ct);
 }

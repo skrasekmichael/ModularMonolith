@@ -47,7 +47,7 @@ public sealed class BuildingBlocksDependencyTests : BaseArchitectureTests
 	}
 
 	[Fact]
-	public void CommonInfrastructure_Should_DependOnlyOn_CommonDomain_And_CommonApplication_And_CommonContracts()
+	public void CommonInfrastructure_Should_DependOnlyOn_CommonLayers()
 	{
 		var assemblies = GetAllAssemblies();
 
@@ -56,7 +56,8 @@ public sealed class BuildingBlocksDependencyTests : BaseArchitectureTests
 			CommonDomainAssembly,
 			CommonApplicationAssembly,
 			CommonContractsAssembly,
-			CommonInfrastructureAssembly
+			CommonInfrastructureAssembly,
+			CommonEndpointsAssembly
 		};
 
 		var failingTypes = Types.InAssembly(CommonInfrastructureAssembly)

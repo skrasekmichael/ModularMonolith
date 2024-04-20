@@ -7,13 +7,16 @@ using RailwayResult;
 using RailwayResult.Errors;
 
 using TeamUp.Common.Application;
+using TeamUp.Common.Contracts;
 using TeamUp.Common.Contracts.Errors;
 using TeamUp.Common.Infrastructure.Persistence;
 using TeamUp.Common.Infrastructure.Processing;
 
 namespace TeamUp.Common.Infrastructure.Services;
 
-internal sealed class UnitOfWork<TDatabaseContext> : IUnitOfWork where TDatabaseContext : DbContext, IDatabaseContext
+internal sealed class UnitOfWork<TDatabaseContext, TModuleId> : IUnitOfWork<TModuleId>
+	where TDatabaseContext : DbContext, IDatabaseContext<TModuleId>
+	where TModuleId : IModuleId
 {
 	internal static readonly ConcurrencyError ConcurrencyError = new($"{typeof(TDatabaseContext).Name}Database.Concurrency.Conflict", "Multiple concurrent update requests have occurred.");
 	internal static readonly ConflictError UniqueConstraintError = new($"{typeof(TDatabaseContext).Name}Database.Constraints.PropertyConflict", "Unique property conflict has occurred.");
@@ -21,9 +24,9 @@ internal sealed class UnitOfWork<TDatabaseContext> : IUnitOfWork where TDatabase
 
 	private readonly TDatabaseContext _dbContext;
 	private readonly DomainEventsDispatcher _domainEventsDispatcher;
-	private readonly ILogger<UnitOfWork<TDatabaseContext>> _logger;
+	private readonly ILogger<UnitOfWork<TDatabaseContext, TModuleId>> _logger;
 
-	public UnitOfWork(TDatabaseContext dbContext, DomainEventsDispatcher domainEventsDispatcher, ILogger<UnitOfWork<TDatabaseContext>> logger)
+	public UnitOfWork(TDatabaseContext dbContext, DomainEventsDispatcher domainEventsDispatcher, ILogger<UnitOfWork<TDatabaseContext, TModuleId>> logger)
 	{
 		_dbContext = dbContext;
 		_domainEventsDispatcher = domainEventsDispatcher;

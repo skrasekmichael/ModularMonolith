@@ -16,7 +16,8 @@ internal sealed class DomainEventsDispatcher
 		_publisher = publisher;
 	}
 
-	public async Task DispatchDomainEventsAsync<TDatabaseContext>(TDatabaseContext dbContext, CancellationToken ct = default) where TDatabaseContext : DbContext, IDatabaseContext
+	public async Task DispatchDomainEventsAsync<TDatabaseContext>(TDatabaseContext dbContext, CancellationToken ct = default)
+		where TDatabaseContext : DbContext, IDatabaseContext
 	{
 		List<IHasDomainEvent> GetEntitiesWithUnpublishedDomainEvents()
 		{
@@ -39,8 +40,10 @@ internal sealed class DomainEventsDispatcher
 			entities.ForEach(entity => entity.ClearDomainEvents());
 
 			//publish all domain events
-			var tasks = domainEvents.Select(domainEvent => _publisher.Publish(domainEvent, ct));
-			await Task.WhenAll(tasks);
+			foreach (var domainEvent in domainEvents)
+			{
+				await _publisher.Publish(domainEvent, ct);
+			}
 		}
 	}
 }

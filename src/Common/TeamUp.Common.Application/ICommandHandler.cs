@@ -2,7 +2,7 @@
 
 using RailwayResult;
 
-using TeamUp.Application.Abstractions;
+using TeamUp.Common.Contracts;
 
 namespace TeamUp.Common.Application;
 

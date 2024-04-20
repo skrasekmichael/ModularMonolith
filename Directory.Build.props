@@ -6,4 +6,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="TeamUp.Tests.EndToEnd" />
+  </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@ using Bogus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
+using TeamUp.Common.Application;
 using TeamUp.Common.Contracts;
 using TeamUp.Common.Infrastructure.Persistence;
 using TeamUp.UserAccess.Application.Abstractions;
@@ -79,7 +80,18 @@ public abstract class BaseEndpointTests(AppFixture app) : IAsyncLifetime
 		return result;
 	}
 
-	protected Task WaitForIntegrationEventsAsync() => Task.Delay(800);
+	protected async ValueTask WaitForIntegrationEventHandlerAsync<THandler>(int minInvokes = 1, int millisecondsTimeout = 10_000) where THandler : IIntegrationEventHandlerMarker
+	{
+		var callback = App.Services.GetRequiredService<Owner<THandler, CallbackCounter>>().Service;
+		if (callback.Count >= minInvokes)
+		{
+			return;
+		}
+
+		var waitTask = callback.WaitForCallbackAsync();
+		var completedTask = await Task.WhenAny(waitTask, Task.Delay(millisecondsTimeout));
+		ReferenceEquals(completedTask, waitTask).Should().BeTrue($"{typeof(THandler).Name} has to be called");
+	}
 
 	public Task DisposeAsync()
 	{

@@ -1,3 +1,8 @@
-﻿namespace TeamUp.UserAccess.Contracts;
+﻿using TeamUp.Common.Contracts;
 
-public sealed class AssemblyReference;
+namespace TeamUp.UserAccess.Contracts;
+
+public sealed class UserAccessModuleId : IModuleId
+{
+	public static string ModuleName { get; } = "UserAccess";
+}
