@@ -2,4 +2,4 @@
 
 namespace TeamUp.TeamManagement.Infrastructure.Persistence;
 
-internal sealed class DesignTimeDbContextFactory : DesignTimeDatabaseContextFactory<TeamManagementDbContext>;
+internal sealed class DesignTimeDbContextFactory : DesignTimeDatabaseContextFactory<TeamManagementDbContext, Contracts.TeamManagementModuleId>;

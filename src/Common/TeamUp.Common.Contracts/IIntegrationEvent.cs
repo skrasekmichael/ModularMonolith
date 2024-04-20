@@ -1,3 +1,3 @@
-﻿namespace TeamUp.Domain.Abstractions;
+﻿namespace TeamUp.Common.Contracts;
 
 public interface IIntegrationEvent;

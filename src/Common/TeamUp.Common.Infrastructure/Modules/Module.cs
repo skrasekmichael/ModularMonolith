@@ -2,28 +2,40 @@
 
 using MassTransit;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-using TeamUp.Application.Abstractions;
+using Quartz;
+
 using TeamUp.Common.Application;
 using TeamUp.Common.Contracts;
+using TeamUp.Common.Domain;
 using TeamUp.Common.Infrastructure.Extensions;
+using TeamUp.Common.Infrastructure.Persistence;
 using TeamUp.Common.Infrastructure.Processing.Commands;
+using TeamUp.Common.Infrastructure.Processing.Inbox;
 using TeamUp.Common.Infrastructure.Processing.IntegrationEvents;
+using TeamUp.Common.Infrastructure.Processing.Outbox;
 using TeamUp.Common.Infrastructure.Processing.Queries;
+using TeamUp.Common.Infrastructure.Services;
 
 namespace TeamUp.Common.Infrastructure.Modules;
 
-public abstract class Module : IModule
+public abstract class Module<TModuleId, TDatabaseContext> : IModule
+	where TModuleId : class, IModuleId
+	where TDatabaseContext : DbContext, IDatabaseContext<TModuleId>
 {
 	private static readonly Type QueryType = typeof(IQuery<>);
-	private static readonly Type QueryConsumerType = typeof(QueryHandlerFacade<,>);
+	private static readonly Type QueryConsumerType = typeof(QueryConsumerFacade<,>);
 	private static readonly Type CommandType = typeof(ICommand);
-	private static readonly Type CommandConsumerType = typeof(CommandHandlerFacade<>);
+	private static readonly Type CommandConsumerType = typeof(CommandConsumerFacade<>);
 	private static readonly Type CommandWithResponseType = typeof(ICommand<>);
-	private static readonly Type CommandWithResponseConsumerType = typeof(CommandHandlerFacade<,>);
+	private static readonly Type CommandWithResponseConsumerType = typeof(CommandConsumerFacade<,>);
 	private static readonly Type IntegrationEventHandlerType = typeof(IIntegrationEventHandler<>);
-	private static readonly Type IntegrationEventConsumerType = typeof(IntegrationEventHandlerFacade<,>);
+	private static readonly Type IntegrationEventConsumerType = typeof(IntegrationEventConsumerFacade<,,>);
+
+	private static readonly JobKey ProcessOutboxJobKey = new(TModuleId.ModuleName + "Outbox");
+	private static readonly JobKey ProcessInboxJobKey = new(TModuleId.ModuleName + "Inbox");
 
 	public abstract Assembly ContractsAssembly { get; }
 	public abstract Assembly ApplicationAssembly { get; }
@@ -62,8 +74,7 @@ public abstract class Module : IModule
 				continue;
 			}
 
-			var commandInterface = type.GetInterfaceWithGenericDefinition(CommandType);
-			if (commandInterface is not null)
+			if (type.ImplementInterfaceOfType(CommandType))
 			{
 				var consumerType = CommandConsumerType.MakeGenericType(type);
 				cfg.AddConsumer(consumerType);
@@ -83,13 +94,61 @@ public abstract class Module : IModule
 			var eventHandlerInterface = type.GetInterfaceWithGenericDefinition(IntegrationEventHandlerType);
 			if (eventHandlerInterface is not null)
 			{
-				services.AddScoped(type);
-				var responseType = eventHandlerInterface.GetGenericType()
+				services.AddScoped(type); //register handler
+				var integrationEvent = eventHandlerInterface.GetGenericType()
 					?? throw new InternalException($"Unexpected generic type when registering integration event consumer in module '{GetType().Name}'.");
 
-				var consumerType = IntegrationEventConsumerType.MakeGenericType(type, responseType);
-				cfg.AddConsumer(consumerType);
+				var consumerType = IntegrationEventConsumerType.MakeGenericType(typeof(TModuleId), type, integrationEvent);
+				cfg.AddConsumer(consumerType); //register consumer
 			}
 		}
+	}
+
+	public void ConfigureEssentialServices(IServiceCollection services, IHealthChecksBuilder healthChecks)
+	{
+		services.AddDbContext<TDatabaseContext>((serviceProvide, optionsBuilder) =>
+		{
+			var t = serviceProvide.GetType();
+			var configurator = serviceProvide.GetService<IDbContextConfigurator>()!;
+			configurator.Configure<TDatabaseContext, TModuleId>(optionsBuilder);
+		});
+
+		healthChecks.AddDbContextCheck<TDatabaseContext>();
+
+		services.AddScoped<IUnitOfWork<TModuleId>, UnitOfWork<TDatabaseContext, TModuleId>>();
+		services.AddScoped<IIntegrationEventPublisher<TModuleId>, IntegrationEventPublisher<TDatabaseContext, TModuleId>>();
+		services.AddScoped<IInboxProducer<TModuleId>, InboxProducer<TDatabaseContext, TModuleId>>();
+		services.AddScoped<IProcessOutboxMessagesJob<TModuleId>, ProcessOutboxMessagesJob<TDatabaseContext, TModuleId>>();
+		services.AddScoped<IProcessInboxMessagesJob<TModuleId>, ProcessInboxMessagesJob<TDatabaseContext, TModuleId>>();
+	}
+
+	(string Name, string Schema) IModule.GetMigrationTable() => DatabaseUtils.GetMigrationsTable<TDatabaseContext, TModuleId>();
+
+	DbContext IModule.CreateDatabaseContext(string connectionString) => DatabaseUtils.CreateDatabaseContext<TDatabaseContext, TModuleId>(connectionString);
+
+	public DbContext GetDatabaseContext<TScope>(TScope scope) where TScope : IServiceScope =>
+		scope.ServiceProvider.GetRequiredService<TDatabaseContext>();
+
+	public void ConfigureJobs(IServiceCollectionQuartzConfigurator configurator)
+	{
+		configurator
+			.AddJob<IProcessOutboxMessagesJob<TModuleId>>(ProcessOutboxJobKey)
+			.AddTrigger(trigger =>
+			{
+				trigger
+					.ForJob(ProcessOutboxJobKey)
+					.WithSimpleSchedule(schedule => schedule
+						.WithIntervalInSeconds(2)
+						.RepeatForever());
+			})
+			.AddJob<IProcessInboxMessagesJob<TModuleId>>(ProcessInboxJobKey)
+			.AddTrigger(trigger =>
+			{
+				trigger
+					.ForJob(ProcessInboxJobKey)
+					.WithSimpleSchedule(schedule => schedule
+						.WithIntervalInSeconds(2)
+						.RepeatForever());
+			});
 	}
 }

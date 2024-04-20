@@ -1,8 +1,8 @@
 ﻿using TeamUp.Common.Application;
-using TeamUp.Domain.Aggregates.Users;
 using TeamUp.UserAccess.Application.Abstractions;
 using TeamUp.UserAccess.Contracts;
 using TeamUp.UserAccess.Contracts.Login;
+using TeamUp.UserAccess.Domain;
 
 namespace TeamUp.UserAccess.Application;
 

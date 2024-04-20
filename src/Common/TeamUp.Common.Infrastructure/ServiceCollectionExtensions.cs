@@ -3,11 +3,11 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using TeamUp.Common.Contracts;
-using TeamUp.Common.Infrastructure.Extensions;
 using TeamUp.Common.Infrastructure.Modules;
 using TeamUp.Common.Infrastructure.Options;
-using TeamUp.Common.Infrastructure.Persistence;
 using TeamUp.Common.Infrastructure.Processing;
+using TeamUp.Common.Infrastructure.Processing.Inbox;
+using TeamUp.Common.Infrastructure.Processing.Outbox;
 using TeamUp.Common.Infrastructure.Services;
 
 namespace TeamUp.Common.Infrastructure;
@@ -24,7 +24,18 @@ public static class ServiceCollectionExtensions
 		return services;
 	}
 
-	public static IEnumerable<IModule> AddInfrastructure(this IServiceCollection services, Action<ModulesConfigurator> configure)
+	public static IServiceCollection AddAppOptions<TOptions>(this IServiceCollection services, Action<TOptions> configure) where TOptions : class, IAppOptions
+	{
+		services.AddOptions<TOptions>()
+			.BindConfiguration(TOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart()
+			.PostConfigure(configure);
+
+		return services;
+	}
+
+	public static IServiceCollection AddInfrastructure(this IServiceCollection services)
 	{
 		services
 			.AddAppOptions<DatabaseOptions>()
@@ -34,34 +45,34 @@ public static class ServiceCollectionExtensions
 
 		services
 			.AddSingleton<IDateTimeProvider, DateTimeProvider>()
-			.AddSingleton<IDbContextConfigurator, DbContextConfigurator>()
-			.AddScoped<DomainEventsDispatcher>();
+			.AddSingleton<IDbContextConfigurator, DbContextConfigurator>();
 
-		services.AddDbContext<OutboxDbContext>((serviceProvide, optionsBuilder) =>
-		{
-			var configurator = serviceProvide.GetRequiredService<IDbContextConfigurator>();
-			configurator.Configure<OutboxDbContext>(optionsBuilder);
-		});
+		services.AddScoped<DomainEventsDispatcher>();
+		services.AddScoped<OutboxConsumer>();
+		services.AddScoped<IInboxConsumer, InboxConsumer>();
 
-		var modules = new ModulesConfigurator();
+		return services;
+	}
+
+	public static IEnumerable<IModule> AddModules(this IServiceCollection services, Action<ModulesBuilder> configure)
+	{
+		var modules = new ModulesBuilder();
 		configure(modules);
 
 		var healthChecks = services.AddHealthChecks();
 
 		foreach (var module in modules)
 		{
-			module.ConfigureServices(services);
-			module.ConfigureHealthChecks(healthChecks);
 			services.AddValidatorsFromAssembly(module.ContractsAssembly);
 
-			if (module is IModuleWithDatabase dbModule)
-			{
-				dbModule.ConfigureDatabase(services);
-			}
+			module.ConfigureServices(services);
+			module.ConfigureHealthChecks(healthChecks);
+			module.ConfigureEssentialServices(services, healthChecks);
 		}
 
 		modules.ConfigureMassTransit(services);
 		modules.ConfigureMediatR(services);
+		modules.ConfigureBackgroundJobs(services);
 
 		return modules;
 	}

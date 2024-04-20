@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
+using TeamUp.Common.Contracts;
 using TeamUp.Common.Infrastructure.Options;
 using TeamUp.Common.Infrastructure.Persistence;
 
@@ -15,12 +16,15 @@ internal sealed class DbContextConfigurator : IDbContextConfigurator
 		_options = options;
 	}
 
-	public void Configure<TDatabaseContext>(DbContextOptionsBuilder optionsBuilder) where TDatabaseContext : DbContext, IDatabaseContext
+	public void Configure<TDatabaseContext, TModuleId>(DbContextOptionsBuilder optionsBuilder)
+		where TDatabaseContext : DbContext, IDatabaseContext<TModuleId>
+		where TModuleId : IModuleId
 	{
 		optionsBuilder.UseNpgsql(_options.Value.ConnectionString, options =>
 		{
+			var (tableName, schema) = DatabaseUtils.GetMigrationsTable<TDatabaseContext, TModuleId>();
 			options.MigrationsAssembly(typeof(TDatabaseContext).Assembly.GetName().Name);
-			options.MigrationsHistoryTable(IDatabaseContext.MIGRATIONS_HISTORY_TABLE, TDatabaseContext.ModuleName);
+			options.MigrationsHistoryTable(tableName, schema);
 		});
 	}
 }

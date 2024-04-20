@@ -1,4 +1,5 @@
 ﻿using TeamUp.Common.Infrastructure.Modules;
+using TeamUp.Notifications.Infrastructure;
 using TeamUp.TeamManagement.Infrastructure;
 using TeamUp.UserAccess.Infrastructure;
 
@@ -8,6 +9,7 @@ public static class ModulesAccessor
 {
 	public static IModule[] Modules { get; } = [
 		new UserAccessModule(),
-		new TeamManagementModule()
+		new TeamManagementModule(),
+		new NotificationsModule()
 	];
 }

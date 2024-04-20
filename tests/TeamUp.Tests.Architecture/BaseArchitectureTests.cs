@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 
 using TeamUp.Common.Application;
+using TeamUp.Common.Contracts;
 using TeamUp.Common.Domain;
 using TeamUp.Common.Endpoints;
 using TeamUp.Common.Infrastructure.Modules;
 using TeamUp.Common.Infrastructure.Processing;
-using TeamUp.Domain.Abstractions;
 using TeamUp.Tests.Architecture.Extensions;
 using TeamUp.Tests.Common;
 

@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\TeamUp.Common.Domain\TeamUp.Common.Domain.csproj" />
+    <ProjectReference Include="..\..\Notifications\TeamUp.Notifications.Contracts\TeamUp.Notifications.Contracts.csproj" />
     <ProjectReference Include="..\TeamUp.UserAccess.Contracts\TeamUp.UserAccess.Contracts.csproj" />
   </ItemGroup>
 

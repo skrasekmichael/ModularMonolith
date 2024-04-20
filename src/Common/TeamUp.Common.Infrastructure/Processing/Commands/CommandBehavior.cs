@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using System.Transactions;
 
 using FluentValidation;
 using FluentValidation.Results;
@@ -11,9 +10,8 @@ using Microsoft.Extensions.Logging;
 using RailwayResult;
 using RailwayResult.Errors;
 
-using TeamUp.Application.Abstractions;
+using TeamUp.Common.Contracts;
 using TeamUp.Common.Contracts.Errors;
-using TeamUp.Common.Infrastructure.Persistence;
 
 namespace TeamUp.Common.Infrastructure.Processing.Commands;
 
@@ -25,13 +23,11 @@ internal sealed class CommandBehavior<TCommand, TResponse> : IPipelineBehavior<T
 
 	private readonly IValidator<TCommand> _validator;
 	private readonly ILogger<CommandBehavior<TCommand, TResponse>> _logger;
-	private readonly OutboxDbContext _outboxDbContext;
 
-	public CommandBehavior(IValidator<TCommand> validator, ILogger<CommandBehavior<TCommand, TResponse>> logger, OutboxDbContext outboxDbContext)
+	public CommandBehavior(IValidator<TCommand> validator, ILogger<CommandBehavior<TCommand, TResponse>> logger)
 	{
 		_validator = validator;
 		_logger = logger;
-		_outboxDbContext = outboxDbContext;
 	}
 
 	public static ValidationErrors ValidationError(ValidationResult validationResult) =>
@@ -47,17 +43,9 @@ internal sealed class CommandBehavior<TCommand, TResponse> : IPipelineBehavior<T
 			return Unsafe.As<TResponse>(TResponse.FromError(ValidationError(validationResult)));
 		}
 
-		using var scope = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
 		try
 		{
-			var result = await next();
-			if (result.IsSuccess)
-			{
-				await _outboxDbContext.SaveChangesAsync(ct);
-			}
-
-			scope.Complete();
-			return result;
+			return await next();
 		}
 		catch (Exception ex)
 		{

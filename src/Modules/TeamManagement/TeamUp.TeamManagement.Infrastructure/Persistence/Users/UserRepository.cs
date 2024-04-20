@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using TeamUp.Domain.Aggregates.Users;
 using TeamUp.TeamManagement.Domain.Aggregates;
 using TeamUp.UserAccess.Contracts;
 

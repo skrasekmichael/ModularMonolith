@@ -2,7 +2,7 @@
 
 using RailwayResult;
 
-namespace TeamUp.Application.Abstractions;
+namespace TeamUp.Common.Contracts;
 
 public interface IQuery<TResponse> : IRequest<Result<TResponse>>, IQueryPipeline;
 

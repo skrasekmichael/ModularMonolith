@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Json;
 
 using TeamUp.TeamManagement.Infrastructure;
-using TeamUp.UserAccess.Contracts;
 using TeamUp.UserAccess.Contracts.CreateUser;
 using TeamUp.UserAccess.Domain;
 using TeamUp.UserAccess.Infrastructure.Persistence;
@@ -37,8 +36,7 @@ public sealed class RegisterUserTests(AppFixture app) : UserAccessTests(app)
 			user.Password.Should().NotBeEquivalentTo(request.Password);
 		});
 
-
-		await WaitForIntegrationEventsAsync();
+		await WaitForIntegrationEventHandlerAsync<TeamManagement.Application.Users.UserCreatedEventHandler>();
 
 		await UseDbContextAsync<TeamManagementDbContext>(async dbContext =>
 		{
@@ -50,7 +48,9 @@ public sealed class RegisterUserTests(AppFixture app) : UserAccessTests(app)
 			user.NumberOfOwnedTeams.Should().Be(0);
 		});
 
-		//TODO check email
+		await WaitForIntegrationEventHandlerAsync<Notifications.Application.Email.EmailCreatedEventHandler>();
+
+		Inbox.Should().Contain(email => email.EmailAddress == request.Email);
 	}
 
 	[Fact]

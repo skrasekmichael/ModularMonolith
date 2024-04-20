@@ -7,6 +7,7 @@ using NetArchTest.Rules;
 
 using TeamUp.Common.Infrastructure.Modules;
 using TeamUp.Tests.Architecture.Extensions;
+using TeamUp.Tests.Common.Extensions;
 
 namespace TeamUp.Tests.Architecture.DependencyTests;
 
@@ -50,12 +51,12 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 		var assemblies = GetAllAssemblies();
 		var applicationAssembly = module.GetLayer(APPLICATION_LAYER);
 
-		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).Concat([
+		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).With(
 			applicationAssembly,
 			CommonDomainAssembly,
 			CommonApplicationAssembly,
 			module.GetLayer(DOMAIN_LAYER)
-		]);
+		);
 
 		var failingTypes = Types.InAssembly(applicationAssembly)
 			.That()
@@ -71,12 +72,16 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 	{
 		var assemblies = GetAllAssemblies();
 		var domainAssembly = module.GetLayer(DOMAIN_LAYER);
+		if (domainAssembly is null)
+		{
+			return;
+		}
 
-		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).Concat([
+		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).With(
 			domainAssembly,
 			CommonDomainAssembly,
 			CommonContractsAssembly
-		]);
+		);
 
 		var failingTypes = Types.InAssembly(domainAssembly)
 			.That()
@@ -93,11 +98,7 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 		var assemblies = GetAllAssemblies();
 		var contractsAssembly = module.GetLayer(CONTRACTS_LAYER);
 
-		var allowedAssemblies = new Assembly[]
-		{
-			contractsAssembly,
-			CommonContractsAssembly
-		};
+		var allowedAssemblies = contractsAssembly.With(CommonContractsAssembly);
 
 		var failingTypes = Types.InAssembly(contractsAssembly)
 			.That()
@@ -114,11 +115,11 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 		var assemblies = GetAllAssemblies();
 		var infrastructureAssembly = module.GetLayer(INFRASTRUCTURE_LAYER);
 
-		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).Concat([
+		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).With(
 			CommonInfrastructureAssembly,
 			CommonDomainAssembly,
-			CommonContractsAssembly,
-		]).Concat(module.Assemblies);
+			CommonContractsAssembly
+		).With(module.Assemblies);
 
 		var failingTypes = Types.InAssembly(infrastructureAssembly)
 			.That()
@@ -134,13 +135,16 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 	{
 		var assemblies = GetAllAssemblies();
 		var endpointsAssembly = module.GetLayer(ENDPOINTS_LAYER);
-
-		var allowedAssemblies = new Assembly[]
+		if (endpointsAssembly is null)
 		{
+			return;
+		}
+
+		var allowedAssemblies = endpointsAssembly.With(
 			endpointsAssembly,
 			CommonEndpointsAssembly,
 			module.GetLayer(CONTRACTS_LAYER)
-		};
+		);
 
 		var failingTypes = Types.InAssembly(endpointsAssembly)
 			.That()

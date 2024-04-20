@@ -12,12 +12,12 @@ public static class HttpResponseMessageExtensions
 		PropertyNameCaseInsensitive = true
 	};
 
-	public static Task<TOut?> ReadFromJsonAsync<TOut>(this HttpResponseMessage message, JsonSerializerOptions? options = null)
-		=> message.Content.ReadFromJsonAsync<TOut>(options ?? DefaultJsonSerializerOptions);
+	public static Task<TOut?> ReadFromJsonAsync<TOut>(this HttpResponseMessage message, JsonSerializerOptions? options = null) =>
+		message.Content.ReadFromJsonAsync<TOut>(options ?? DefaultJsonSerializerOptions);
 
-	public static Task<ProblemDetails?> ReadProblemDetailsAsync(this HttpResponseMessage message, JsonSerializerOptions? options = null)
-		=> message.Content.ReadFromJsonAsync<ProblemDetails>(options ?? DefaultJsonSerializerOptions);
+	public static Task<ProblemDetails?> ReadProblemDetailsAsync(this HttpResponseMessage message, JsonSerializerOptions? options = null) =>
+		message.Content.ReadFromJsonAsync<ProblemDetails>(options ?? DefaultJsonSerializerOptions);
 
-	public static Task<ValidationProblemDetails?> ReadValidationProblemDetailsAsync(this HttpResponseMessage message, JsonSerializerOptions? options = null)
-		=> message.Content.ReadFromJsonAsync<ValidationProblemDetails>(options ?? DefaultJsonSerializerOptions);
+	public static Task<ValidationProblemDetails?> ReadValidationProblemDetailsAsync(this HttpResponseMessage message, JsonSerializerOptions? options = null) =>
+		message.Content.ReadFromJsonAsync<ValidationProblemDetails>(options ?? DefaultJsonSerializerOptions);
 }

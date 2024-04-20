@@ -2,8 +2,6 @@
 
 public static class Constants
 {
-	public const string MODULE_NAME = "UserAccess";
-
 	public const int USERNAME_MIN_SIZE = 3;
 	public const int USERNAME_MAX_SIZE = 30;
 

@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" />
+    <PackageReference Include="MassTransit" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
@@ -10,5 +11,9 @@
   <ItemGroup>
     <ProjectReference Include="..\TeamUp.Common.Contracts\TeamUp.Common.Contracts.csproj" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="TeamUp.Common.Infrastructure" />
+  </ItemGroup>
+
 </Project>

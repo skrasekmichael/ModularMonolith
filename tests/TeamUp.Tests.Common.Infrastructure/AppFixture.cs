@@ -1,6 +1,7 @@
 ﻿using Bogus;
 
 using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -9,9 +10,6 @@ using Npgsql;
 
 using Respawn;
 using Respawn.Graph;
-
-using TeamUp.Common.Infrastructure.Modules;
-using TeamUp.Common.Infrastructure.Persistence;
 
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
@@ -23,6 +21,7 @@ namespace TeamUp.Tests.Common;
 public sealed class AppFixture<TAppFactory> : IAsyncLifetime where TAppFactory : WebApplicationFactory<Program>, IAppFactory<TAppFactory>
 {
 	private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
+		.WithImage("postgres:16.2")
 		.WithDatabase("POSTGRES")
 		.WithUsername("POSTGRES")
 		.WithPassword("DEVPASS")
@@ -32,11 +31,10 @@ public sealed class AppFixture<TAppFactory> : IAsyncLifetime where TAppFactory :
 		.Build();
 
 	private readonly RabbitMqContainer _busContainer = new RabbitMqBuilder()
+		.WithImage("rabbitmq:3.13.1")
 		.WithHostname("rabbitmq")
 		.WithUsername("guest")
 		.WithPassword("guest")
-		.WithExposedPort(5672)
-		.WithPortBinding(5672)
 		.WithCleanUp(true)
 		.WithAutoRemove(true)
 		.Build();
@@ -45,17 +43,17 @@ public sealed class AppFixture<TAppFactory> : IAsyncLifetime where TAppFactory :
 	private Respawner Respawner { get; set; } = null!;
 
 	public string HttpsPort => TAppFactory.HttpsPort;
-	public string ConnectionString => _dbContainer.GetConnectionString();
+	public string ConnectionString => _dbContainer.GetConnectionString() + ";Include Error Detail=true";
 
 	public IServiceProvider Services => AppFactory.Services;
 
-	public AppFixture()
+	public Task InitializeAsync()
 	{
 		Randomizer.Seed = new Random(420_069);
 		Faker.DefaultStrictMode = true;
-	}
 
-	public Task InitializeAsync() => Task.WhenAll(InitBusAsync(), InitDatabaseAsync());
+		return Task.WhenAll(InitBusAsync(), InitDatabaseAsync());
+	}
 
 	private Task InitBusAsync() => _busContainer.StartAsync();
 
@@ -63,14 +61,9 @@ public sealed class AppFixture<TAppFactory> : IAsyncLifetime where TAppFactory :
 	{
 		await _dbContainer.StartAsync();
 
-		var dbModules = ModulesAccessor.Modules.OfType<IModuleWithDatabase>().ToList();
+		var dbModules = ModulesAccessor.Modules.ToList();
 
-		var dbContexts = new List<DbContext>(dbModules.Count + 1)
-		{
-			DatabaseUtils.CreateDatabaseContext<OutboxDbContext>(ConnectionString)
-		};
-
-		dbContexts.AddRange(dbModules.Select(module => module.CreateDatabaseContext(ConnectionString)));
+		var dbContexts = dbModules.Select(module => module.CreateDatabaseContext(ConnectionString));
 
 		var migrationTasks = dbContexts.Select(async dbContext =>
 		{
@@ -86,7 +79,6 @@ public sealed class AppFixture<TAppFactory> : IAsyncLifetime where TAppFactory :
 
 		var migrationTables = dbModules
 			.Select(module => module.GetMigrationTable())
-			.Append(DatabaseUtils.GetMigrationsTable<OutboxDbContext>())
 			.Select(table => new Table(table.Name, table.Schema))
 			.ToArray();
 
@@ -96,14 +88,20 @@ public sealed class AppFixture<TAppFactory> : IAsyncLifetime where TAppFactory :
 			TablesToIgnore = migrationTables
 		});
 
-		AppFactory = TAppFactory.Create(ConnectionString);
+		AppFactory = TAppFactory.Create(ConnectionString, _busContainer.GetConnectionString());
 	}
 
-	public Task DisposeAsync() => Task.WhenAll(
-		AppFactory.DisposeAsync().AsTask(),
-		_dbContainer.DisposeAsync().AsTask(),
-		_busContainer.DisposeAsync().AsTask()
-	);
+	public async Task DisposeAsync()
+	{
+		await AppFactory.DisposeAsync();
+		await Task.WhenAll(DisposeContainer(_dbContainer), DisposeContainer(_busContainer));
+	}
+
+	private async Task DisposeContainer<TContainer>(TContainer container) where TContainer : DockerContainer
+	{
+		await container.StopAsync();
+		await container.DisposeAsync();
+	}
 
 	public HttpClient CreateClient() => AppFactory.CreateClient();
 	public HttpClient CreateClient(WebApplicationFactoryClientOptions options) => AppFactory.CreateClient(options);

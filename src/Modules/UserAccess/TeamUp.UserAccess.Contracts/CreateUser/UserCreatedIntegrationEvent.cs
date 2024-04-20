@@ -1,4 +1,4 @@
-﻿using TeamUp.Domain.Abstractions;
+﻿using TeamUp.Common.Contracts;
 
 namespace TeamUp.UserAccess.Contracts.CreateUser;
 
