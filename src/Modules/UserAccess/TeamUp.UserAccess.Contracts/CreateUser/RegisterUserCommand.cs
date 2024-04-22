@@ -16,8 +16,8 @@ public sealed record RegisterUserCommand : ICommand<UserId>
 		{
 			RuleFor(x => x.Name)
 				.NotEmpty()
-				.MinimumLength(Constants.USERNAME_MIN_SIZE)
-				.MaximumLength(Constants.USERNAME_MAX_SIZE);
+				.MinimumLength(UserConstants.USERNAME_MIN_SIZE)
+				.MaximumLength(UserConstants.USERNAME_MAX_SIZE);
 
 			RuleFor(x => x.Email)
 				.NotEmpty()

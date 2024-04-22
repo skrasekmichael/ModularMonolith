@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 
 using Bogus;
 
@@ -16,6 +17,8 @@ namespace TeamUp.Tests.EndToEnd.EndpointTests;
 [Collection(nameof(AppCollectionFixture))]
 public abstract class BaseEndpointTests(AppFixture app) : IAsyncLifetime
 {
+	private static readonly Type IntegrationEventHandlerType = typeof(IIntegrationEventHandler<>);
+
 	protected static Faker F => FakerExtensions.F;
 
 	protected AppFixture App { get; } = app;
@@ -38,6 +41,29 @@ public abstract class BaseEndpointTests(AppFixture app) : IAsyncLifetime
 		DateTimeProvider.ExactTime = null;
 
 		Inbox.Clear();
+		ClearAllCallbackCounters();
+	}
+
+	private void ClearAllCallbackCounters()
+	{
+		static bool IsIntegrationEventHandlerType(Type type)
+		{
+			return type
+				.GetInterfaces()
+				.Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == IntegrationEventHandlerType);
+		}
+
+		var types = ModulesAccessor.Modules
+			.SelectMany(module => module.ApplicationAssembly
+				.GetTypes()
+				.Where(type => type.IsClass && !type.IsAbstract && IsIntegrationEventHandlerType(type)));
+
+		foreach (var handlerType in types)
+		{
+			var callbackType = typeof(Owner<,>).MakeGenericType(handlerType, typeof(CallbackCounter));
+			var callback = Unsafe.As<Owner<object, CallbackCounter>>(App.Services.GetRequiredService(callbackType));
+			callback.Service.Reset();
+		}
 	}
 
 	public void Authenticate(User user)

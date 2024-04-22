@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 
 using TeamUp.TeamManagement.Infrastructure;
+using TeamUp.Tests.Common.DataGenerators.UserAccess;
 using TeamUp.UserAccess.Contracts.CreateUser;
 using TeamUp.UserAccess.Domain;
 using TeamUp.UserAccess.Infrastructure.Persistence;
@@ -79,7 +80,7 @@ public sealed class RegisterUserTests(AppFixture app) : UserAccessTests(app)
 		response.Should().Be409Conflict();
 
 		var problemDetails = await response.ReadProblemDetailsAsync();
-		problemDetails.ShouldContainError(Errors.ConflictingEmail);
+		problemDetails.ShouldContainError(UserErrors.ConflictingEmail);
 	}
 
 	[Theory]

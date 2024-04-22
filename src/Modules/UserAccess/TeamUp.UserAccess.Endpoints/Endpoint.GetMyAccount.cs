@@ -28,9 +28,9 @@ internal sealed class GetMyAccountEndpoint : IEndpoint
 		HttpContext httpContext,
 		CancellationToken ct)
 	{
-		var query = new GetAccountDetailsQuery
+		var query = new GetUserDetailsQuery
 		{
-			UserId = httpContext.GetCurrentUserId<UserId>()
+			UserId = httpContext.GetCurrentUserId()
 		};
 
 		var result = await sender.Send(query, ct);
