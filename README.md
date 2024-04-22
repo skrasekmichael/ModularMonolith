@@ -1,0 +1,3 @@
+# Modular Monolith Backend
+**Modular Monolith** Backend developed using **Domain-Driven Design**, CQRS, Postgres, EF Core, MassTransit, custom outbox implementation ... 
+This is a backend for a demonstration application *"TeamUp"* (team managment application) as part of my **Master's Thesis** at [BUT FIT](https://www.fit.vut.cz/.en).
