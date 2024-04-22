@@ -6,4 +6,8 @@
     <ProjectReference Include="..\TeamUp.TeamManagement.Contracts\TeamUp.TeamManagement.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="TeamUp.TeamManagement.Infrastructure"/>
+  </ItemGroup>
+
 </Project>

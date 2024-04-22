@@ -14,7 +14,7 @@ public sealed class UserFactory
 		return await name
 			.Ensure(Rules.UserNameMinSize, Rules.UserNameMaxSize)
 			.ThenAsync(_ => _userRepository.ExistsUserWithConflictingEmailAsync(email, ct))
-			.Ensure(conflictingUserExists => conflictingUserExists == false, Errors.ConflictingEmail)
+			.Ensure(conflictingUserExists => conflictingUserExists == false, UserErrors.ConflictingEmail)
 			.Then(_ => User.Create(name, email, password))
 			.Tap(_userRepository.AddUser);
 	}

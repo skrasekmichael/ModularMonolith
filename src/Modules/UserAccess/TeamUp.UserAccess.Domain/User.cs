@@ -32,4 +32,15 @@ public sealed class User : AggregateRoot<User, UserId>
 		password,
 		UserState.NotActivated
 	);
+
+	public void Delete()
+	{
+		AddDomainEvent(new UserDeletedDomainEvent(this));
+	}
+
+	public void Activate()
+	{
+		State = UserState.Activated;
+		AddDomainEvent(new UserActivatedDomainEvent(this));
+	}
 }

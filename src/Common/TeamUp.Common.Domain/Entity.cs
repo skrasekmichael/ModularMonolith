@@ -19,7 +19,7 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IHasDomainEvent whe
 		Id = id;
 	}
 
-	protected void AddDomainEvent(IDomainEvent domainEvent) => _domainEvents.Add(domainEvent);
+	public void AddDomainEvent(IDomainEvent domainEvent) => _domainEvents.Add(domainEvent);
 
 	public void ClearDomainEvents() => _domainEvents.Clear();
 

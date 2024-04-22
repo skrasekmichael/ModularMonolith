@@ -4,9 +4,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 using TeamUp.Common.Infrastructure.Modules;
 using TeamUp.TeamManagement.Contracts;
-using TeamUp.TeamManagement.Domain.Aggregates;
+using TeamUp.TeamManagement.Domain.Aggregates.Events;
+using TeamUp.TeamManagement.Domain.Aggregates.Invitations;
+using TeamUp.TeamManagement.Domain.Aggregates.Teams;
+using TeamUp.TeamManagement.Domain.Aggregates.Users;
 using TeamUp.TeamManagement.Endpoints;
-using TeamUp.TeamManagement.Infrastructure.Persistence.Users;
+using TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Events;
+using TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Invitations;
+using TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Teams;
+using TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Users;
 
 namespace TeamUp.TeamManagement.Infrastructure;
 
@@ -25,6 +31,11 @@ public sealed class TeamManagementModule : ModuleWithEndpoints<TeamManagementMod
 
 	public override void ConfigureServices(IServiceCollection services)
 	{
-		services.AddScoped<IUserRepository, UserRepository>();
+		services
+			.AddScoped<IUserRepository, UserRepository>()
+			.AddScoped<ITeamRepository, TeamRepository>()
+			.AddScoped<IEventRepository, EventRepository>()
+			.AddScoped<IInvitationRepository, InvitationRepository>()
+			.AddScoped<InvitationFactory>();
 	}
 }

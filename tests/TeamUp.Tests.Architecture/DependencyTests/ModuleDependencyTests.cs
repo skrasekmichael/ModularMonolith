@@ -131,7 +131,7 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 
 	[Theory]
 	[MemberData(nameof(ModulesData))]
-	public void EachModulesEndpointsLayer_Should_DependOnlyOn_CommonEndpoints_Or_Contracts(IModule module)
+	public void EachModulesEndpointsLayer_Should_DependOnlyOn_CommonEndpoints_Or_CommonContracts_Or_Contracts(IModule module)
 	{
 		var assemblies = GetAllAssemblies();
 		var endpointsAssembly = module.GetLayer(ENDPOINTS_LAYER);
@@ -141,15 +141,16 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 		}
 
 		var allowedAssemblies = endpointsAssembly.With(
-			endpointsAssembly,
 			CommonEndpointsAssembly,
+			CommonContractsAssembly,
 			module.GetLayer(CONTRACTS_LAYER)
 		);
 
 		var failingTypes = Types.InAssembly(endpointsAssembly)
 			.That()
 			.HaveDependencyOnAny(assemblies.Except(allowedAssemblies).ToNames())
-			.GetTypes();
+			.GetTypes()
+			.ToList();
 
 		failingTypes.Should().BeEmpty();
 	}
