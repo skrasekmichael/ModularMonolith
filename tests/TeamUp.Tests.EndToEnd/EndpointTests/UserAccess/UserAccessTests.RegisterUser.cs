@@ -1,5 +1,8 @@
 ﻿using System.Net.Http.Json;
 
+using Microsoft.EntityFrameworkCore;
+
+using TeamUp.Common.Infrastructure.Services;
 using TeamUp.TeamManagement.Infrastructure;
 using TeamUp.Tests.Common.DataGenerators.UserAccess;
 using TeamUp.UserAccess.Contracts.CreateUser;
@@ -37,7 +40,7 @@ public sealed class RegisterUserTests(AppFixture app) : UserAccessTests(app)
 			user.Password.Should().NotBeEquivalentTo(request.Password);
 		});
 
-		await WaitForIntegrationEventHandlerAsync<TeamManagement.Application.Users.UserCreatedEventHandler>();
+		await WaitForIntegrationEventHandlerAsync<TeamUp.TeamManagement.Application.Users.UserCreatedEventHandler>();
 
 		await UseDbContextAsync<TeamManagementDbContext>(async dbContext =>
 		{
@@ -96,5 +99,40 @@ public sealed class RegisterUserTests(AppFixture app) : UserAccessTests(app)
 
 		var problemDetails = await response.ReadValidationProblemDetailsAsync();
 		problemDetails.ShouldContainValidationErrorFor(request.InvalidProperty);
+	}
+
+	[Fact]
+	public async Task RegisterUser_WhenConcurrentRegistrationWithSameEmailCompletes_Should_ResultInConflict()
+	{
+		//arrange
+		var request = UserGenerators.ValidRegisterUserRequest.Generate();
+
+		//act
+		var (responseA, responseB) = await RunConcurrentRequestsAsync<UserAccessModuleId>(
+			() => Client.PostAsJsonAsync(URL, request),
+			() => Client.PostAsJsonAsync(URL, request)
+		);
+
+		//assert
+		responseA.Should().Be201Created();
+		responseB.Should().Be409Conflict();
+
+		var userId = await responseA.ReadFromJsonAsync<UserId>();
+		userId.ShouldNotBeNull();
+
+		await UseDbContextAsync<UserAccessDbContext>(async dbContext =>
+		{
+			var user = await dbContext.Users.FindAsync(userId);
+			user.ShouldNotBeNull();
+
+			user.Name.Should().BeEquivalentTo(request.Name);
+			user.Email.Should().BeEquivalentTo(request.Email);
+
+			var singleUser = await dbContext.Users.SingleAsync(user => user.Email == request.Email);
+			user.Should().BeEquivalentTo(singleUser);
+		});
+
+		var problemDetails = await responseB.ReadProblemDetailsAsync();
+		problemDetails.ShouldContainError(UnitOfWork<UserAccessDbContext, UserAccessModuleId>.UniqueConstraintError);
 	}
 }

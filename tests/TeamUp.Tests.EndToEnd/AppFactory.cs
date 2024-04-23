@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
+using TeamUp.Common.Application;
 using TeamUp.Common.Contracts;
 using TeamUp.Common.Infrastructure;
 using TeamUp.Common.Infrastructure.Options;
@@ -46,11 +47,24 @@ public sealed class AppFactory(string dbConnectionString, string busConnectionSt
 
 			//callback
 			services.AddTransient<CallbackCounter>();
+			services.AddTransient<CallbackWithTimeout>();
 
 			//integration events
 			services.AddSingleton(typeof(Owner<,>));
 			services.AddScoped<InboxConsumer>();
 			services.Replace<IInboxConsumer, InboxConsumerWithCallbacksFacade>();
+
+			//unit of work
+			services.AddSingleton(typeof(Owner<,,>));
+			services.AddSingleton<DelayedCommitUnitOfWorkOptions>();
+			foreach (var (dbContextType, moduleIdType) in ModulesAccessor.Modules.GetModuleParams())
+			{
+				var unitOfWorkInterfaceType = typeof(IUnitOfWork<>).MakeGenericType(moduleIdType);
+				var oldType = typeof(UnitOfWork<,>).MakeGenericType(dbContextType, moduleIdType);
+				var newType = typeof(DelayedCommitUnitOfWork<,>).MakeGenericType(dbContextType, moduleIdType);
+				services.Replace(unitOfWorkInterfaceType, newType);
+				services.AddScoped(oldType);
+			}
 		});
 
 		builder.UseEnvironment(Environments.Production);

@@ -3,6 +3,7 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using TeamUp.Common.Infrastructure.Modules;
+using TeamUp.TeamManagement.Application;
 using TeamUp.TeamManagement.Contracts;
 using TeamUp.TeamManagement.Domain.Aggregates.Events;
 using TeamUp.TeamManagement.Domain.Aggregates.Invitations;
@@ -13,13 +14,14 @@ using TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Events;
 using TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Invitations;
 using TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Teams;
 using TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Users;
+using TeamUp.TeamManagement.Infrastructure.Services;
 
 namespace TeamUp.TeamManagement.Infrastructure;
 
 public sealed class TeamManagementModule : ModuleWithEndpoints<TeamManagementModuleId, TeamManagementDbContext, TeamManagementEndpointGroup>
 {
 	public override Assembly ContractsAssembly { get; } = typeof(TeamManagementModuleId).Assembly;
-	public override Assembly ApplicationAssembly { get; } = typeof(Application.AssemblyReference).Assembly;
+	public override Assembly ApplicationAssembly { get; } = typeof(ITeamManagementQueryContext).Assembly;
 
 	public override Assembly[] Assemblies => [
 		ContractsAssembly,
@@ -36,6 +38,7 @@ public sealed class TeamManagementModule : ModuleWithEndpoints<TeamManagementMod
 			.AddScoped<ITeamRepository, TeamRepository>()
 			.AddScoped<IEventRepository, EventRepository>()
 			.AddScoped<IInvitationRepository, InvitationRepository>()
-			.AddScoped<InvitationFactory>();
+			.AddScoped<InvitationFactory>()
+			.AddScoped<ITeamManagementQueryContext, TeamManagementDbQueryContextFacade>();
 	}
 }
