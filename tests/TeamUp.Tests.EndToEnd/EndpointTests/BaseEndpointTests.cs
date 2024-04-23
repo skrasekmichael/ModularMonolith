@@ -26,6 +26,7 @@ public abstract class BaseEndpointTests(AppFixture app) : IAsyncLifetime
 
 	internal SkewDateTimeProvider DateTimeProvider { get; private set; } = null!;
 	internal MailInbox Inbox { get; private set; } = null!;
+	internal DelayedCommitUnitOfWorkOptions DelayedCommitUnitOfWorkOptions { get; private set; } = null!;
 
 	public async Task InitializeAsync()
 	{
@@ -34,8 +35,11 @@ public abstract class BaseEndpointTests(AppFixture app) : IAsyncLifetime
 		Client = App.CreateClient();
 		Client.BaseAddress = new Uri($"https://{Client.BaseAddress!.Host}:{App.HttpsPort}");
 
+		DelayedCommitUnitOfWorkOptions = App.Services.GetRequiredService<DelayedCommitUnitOfWorkOptions>();
 		DateTimeProvider = (SkewDateTimeProvider)App.Services.GetRequiredService<IDateTimeProvider>();
 		Inbox = App.Services.GetRequiredService<MailInbox>();
+
+		DelayedCommitUnitOfWorkOptions.IsDelayRequested = false;
 
 		DateTimeProvider.Skew = TimeSpan.Zero;
 		DateTimeProvider.ExactTime = null;
@@ -117,6 +121,29 @@ public abstract class BaseEndpointTests(AppFixture app) : IAsyncLifetime
 		var waitTask = callback.WaitForCallbackAsync();
 		var completedTask = await Task.WhenAny(waitTask, Task.Delay(millisecondsTimeout));
 		ReferenceEquals(completedTask, waitTask).Should().BeTrue($"{typeof(THandler).Name} has to be called");
+	}
+
+	protected async Task<(HttpResponseMessage A, HttpResponseMessage B)> RunConcurrentRequestsAsync<TModuleId>(Func<Task<HttpResponseMessage>> requestA, Func<Task<HttpResponseMessage>> requestB) where TModuleId : IModuleId
+	{
+		var beforeCommitCallback = App.Services.GetRequiredService<Owner<TModuleId, IBeforeCommit, CallbackWithTimeout>>().Service;
+		var canCommitCallback = App.Services.GetRequiredService<Owner<TModuleId, ICanCommit, CallbackWithTimeout>>().Service;
+
+		var reqA = Task.Run(async () =>
+		{
+			await beforeCommitCallback.WaitForCallbackAsync();
+			DelayedCommitUnitOfWorkOptions.IsDelayRequested = false;
+			var response = await requestA();
+			canCommitCallback.Invoke();
+			return response;
+		});
+
+		var reqB = Task.Run(() =>
+		{
+			DelayedCommitUnitOfWorkOptions.IsDelayRequested = true;
+			return requestB();
+		});
+
+		return await Task.WhenAll(reqA, reqB).ContinueWith(task => (task.Result[0], task.Result[1]));
 	}
 
 	public Task DisposeAsync()

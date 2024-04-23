@@ -44,12 +44,12 @@ internal sealed class UnitOfWork<TDatabaseContext, TModuleId> : IUnitOfWork<TMod
 		}
 		catch (DbUpdateConcurrencyException ex)
 		{
-			_logger.LogInformation("Database Concurrency Conflict: {msg}", ex.Message);
+			_logger.LogInformation("{moduleId} Database Concurrency Conflict: {msg}", typeof(TModuleId).Name, ex.Message);
 			return ConcurrencyError;
 		}
 		catch (DbUpdateException ex)
 		{
-			_logger.LogError(ex.InnerException, "Database Update Exception");
+			_logger.LogError(ex.InnerException, "{moduleId} Database Update Exception", typeof(TModuleId).Name);
 
 			if (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
 			{

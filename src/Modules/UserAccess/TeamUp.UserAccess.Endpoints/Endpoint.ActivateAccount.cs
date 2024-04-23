@@ -11,7 +11,7 @@ using TeamUp.UserAccess.Contracts.Activation;
 
 namespace TeamUp.UserAccess.Endpoints;
 
-public sealed class ActivateAccountEndpoint : IEndpoint
+internal sealed class ActivateAccountEndpoint : IEndpoint
 {
 	public void MapEndpoint(RouteGroupBuilder group)
 	{

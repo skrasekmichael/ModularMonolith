@@ -46,17 +46,20 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 
 	[Theory]
 	[MemberData(nameof(ModulesData))]
-	public void EachModulesApplicationLayer_Should_DependOnlyOn_CommonApplication_Or_CommonDomain_Or_Domain_Or_ContractsOfModules(IModule module)
+	public void EachModulesApplicationLayer_Should_DependOnlyOn_CommonContracts_Or_CommonApplication_Or_CommonDomain_Or_Domain_Or_ContractsOfModules(IModule module)
 	{
 		var assemblies = GetAllAssemblies();
 		var applicationAssembly = module.GetLayer(APPLICATION_LAYER);
 
-		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).With(
-			applicationAssembly,
-			CommonDomainAssembly,
-			CommonApplicationAssembly,
-			module.GetLayer(DOMAIN_LAYER)
-		);
+		var allowedAssemblies = Modules
+			.GetLayerAssemblies(CONTRACTS_LAYER)
+			.With([
+				applicationAssembly,
+				module.GetLayer(DOMAIN_LAYER),
+				CommonDomainAssembly,
+				CommonApplicationAssembly,
+				CommonContractsAssembly
+			]);
 
 		var failingTypes = Types.InAssembly(applicationAssembly)
 			.That()
@@ -77,11 +80,9 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 			return;
 		}
 
-		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).With(
-			domainAssembly,
-			CommonDomainAssembly,
-			CommonContractsAssembly
-		);
+		var allowedAssemblies = Modules
+			.GetLayerAssemblies(CONTRACTS_LAYER)
+			.With(domainAssembly, CommonDomainAssembly, CommonContractsAssembly);
 
 		var failingTypes = Types.InAssembly(domainAssembly)
 			.That()
@@ -93,12 +94,14 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 
 	[Theory]
 	[MemberData(nameof(ModulesData))]
-	public void EachModulesContractsLayer_Should_DependOnlyOn_CommonContracts(IModule module)
+	public void EachModulesContractsLayer_Should_DependOnlyOn_CommonContracts_Or_ContractsOfModules(IModule module)
 	{
 		var assemblies = GetAllAssemblies();
 		var contractsAssembly = module.GetLayer(CONTRACTS_LAYER);
 
-		var allowedAssemblies = contractsAssembly.With(CommonContractsAssembly);
+		var allowedAssemblies = Modules
+			.GetLayerAssemblies(CONTRACTS_LAYER)
+			.With(contractsAssembly, CommonContractsAssembly);
 
 		var failingTypes = Types.InAssembly(contractsAssembly)
 			.That()
@@ -115,11 +118,10 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 		var assemblies = GetAllAssemblies();
 		var infrastructureAssembly = module.GetLayer(INFRASTRUCTURE_LAYER);
 
-		var allowedAssemblies = Modules.GetLayerAssemblies(CONTRACTS_LAYER).With(
-			CommonInfrastructureAssembly,
-			CommonDomainAssembly,
-			CommonContractsAssembly
-		).With(module.Assemblies);
+		var allowedAssemblies = Modules
+			.GetLayerAssemblies(CONTRACTS_LAYER)
+			.With(CommonInfrastructureAssembly, CommonDomainAssembly, CommonContractsAssembly)
+			.With(module.Assemblies);
 
 		var failingTypes = Types.InAssembly(infrastructureAssembly)
 			.That()
@@ -131,7 +133,7 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 
 	[Theory]
 	[MemberData(nameof(ModulesData))]
-	public void EachModulesEndpointsLayer_Should_DependOnlyOn_CommonEndpoints_Or_CommonContracts_Or_Contracts(IModule module)
+	public void EachModulesEndpointsLayer_Should_DependOnlyOn_CommonEndpoints_Or_CommonContracts_Or_ContractsOfModules(IModule module)
 	{
 		var assemblies = GetAllAssemblies();
 		var endpointsAssembly = module.GetLayer(ENDPOINTS_LAYER);
@@ -140,11 +142,9 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 			return;
 		}
 
-		var allowedAssemblies = endpointsAssembly.With(
-			CommonEndpointsAssembly,
-			CommonContractsAssembly,
-			module.GetLayer(CONTRACTS_LAYER)
-		);
+		var allowedAssemblies = Modules
+			.GetLayerAssemblies(CONTRACTS_LAYER)
+			.With(endpointsAssembly, CommonEndpointsAssembly, CommonContractsAssembly);
 
 		var failingTypes = Types.InAssembly(endpointsAssembly)
 			.That()

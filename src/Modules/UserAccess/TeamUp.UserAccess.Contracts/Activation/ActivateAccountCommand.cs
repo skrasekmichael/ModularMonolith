@@ -8,5 +8,11 @@ public sealed record ActivateAccountCommand : ICommand
 {
 	public required UserId UserId { get; init; }
 
-	public sealed class Validator : AbstractValidator<ActivateAccountCommand>;
+	public sealed class Validator : AbstractValidator<ActivateAccountCommand>
+	{
+		public Validator()
+		{
+			RuleFor(x => x.UserId).NotEmpty();
+		}
+	}
 }

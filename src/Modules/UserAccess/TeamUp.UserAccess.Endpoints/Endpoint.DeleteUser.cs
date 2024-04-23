@@ -11,7 +11,7 @@ using TeamUp.UserAccess.Contracts.DeleteUser;
 
 namespace TeamUp.UserAccess.Endpoints;
 
-public sealed class DeleteUserEndpoint : IEndpoint
+internal sealed class DeleteUserEndpoint : IEndpoint
 {
 	public void MapEndpoint(RouteGroupBuilder group)
 	{
