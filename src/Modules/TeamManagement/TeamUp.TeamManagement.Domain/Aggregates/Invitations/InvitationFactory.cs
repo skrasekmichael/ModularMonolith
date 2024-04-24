@@ -7,10 +7,10 @@ using TeamUp.UserAccess.Contracts;
 
 namespace TeamUp.TeamManagement.Domain.Aggregates.Invitations;
 
-internal sealed class InvitationFactory
+public sealed class InvitationFactory
 {
-	private readonly IInvitationRepository _invitationRepository;
 	private readonly IDateTimeProvider _dateTimeProvider;
+	private readonly IInvitationRepository _invitationRepository;
 
 	public InvitationFactory(IInvitationRepository invitationRepository, IDateTimeProvider dateTimeProvider)
 	{
@@ -18,13 +18,16 @@ internal sealed class InvitationFactory
 		_dateTimeProvider = dateTimeProvider;
 	}
 
-	public async Task<Result<Invitation>> CreateInvitationAsync(UserId userId, TeamId teamId, CancellationToken ct)
+	public async Task<Result<Invitation>> CreateAndAddInvitationAsync(UserId userId, TeamId teamId, CancellationToken ct)
 	{
 		if (await _invitationRepository.ExistsInvitationForUserToTeamAsync(userId, teamId, ct))
 		{
 			return InvitationErrors.UserIsAlreadyInvited;
 		}
 
-		return new Invitation(InvitationId.New(), userId, teamId, _dateTimeProvider.UtcNow);
+		var invitation = new Invitation(InvitationId.New(), userId, teamId, _dateTimeProvider.UtcNow);
+		_invitationRepository.AddInvitation(invitation);
+
+		return invitation;
 	}
 }

@@ -36,7 +36,10 @@ public sealed class EndpointGroupBuilder
 
 	public EndpointGroupBuilder Configure(Func<RouteGroupBuilder, RouteGroupBuilder> configureGroup)
 	{
-		Group = configureGroup(Group);
+		foreach (var group in _subGroups)
+		{
+			group.Group = configureGroup(group.Group);
+		}
 		return this;
 	}
 

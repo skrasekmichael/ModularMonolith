@@ -1,12 +1,15 @@
 ﻿global using InvitationGenerator = Bogus.Faker<TeamUp.TeamManagement.Domain.Aggregates.Invitations.Invitation>;
 
 using TeamUp.TeamManagement.Contracts.Invitations;
+using TeamUp.TeamManagement.Contracts.Invitations.InviteUser;
 using TeamUp.TeamManagement.Contracts.Teams;
 using TeamUp.TeamManagement.Domain.Aggregates.Invitations;
 using TeamUp.TeamManagement.Domain.Aggregates.Teams;
 using TeamUp.TeamManagement.Domain.Aggregates.Users;
 using TeamUp.Tests.Common.Extensions;
 using TeamUp.UserAccess.Contracts;
+
+using Xunit;
 
 namespace TeamUp.Tests.Common.DataGenerators.TeamManagement;
 
@@ -50,5 +53,41 @@ public sealed class InvitationGenerators : BaseGenerator
 				.RuleFor(i => i.CreatedUtc, createdUtc)
 				.Generate()
 		).ToList();
+	}
+
+	public sealed class InvalidInviteUserRequest : TheoryData<InvalidRequest<InviteUserRequest>>
+	{
+		public InvalidInviteUserRequest()
+		{
+			this.Add(x => x.Email, new InviteUserRequest
+			{
+				TeamId = TeamId.New(),
+				Email = ""
+			});
+
+			this.Add(x => x.Email, new InviteUserRequest
+			{
+				TeamId = TeamId.New(),
+				Email = "@@"
+			});
+
+			this.Add(x => x.Email, new InviteUserRequest
+			{
+				TeamId = TeamId.New(),
+				Email = "invalid email"
+			});
+
+			this.Add(x => x.Email, new InviteUserRequest
+			{
+				TeamId = TeamId.New(),
+				Email = "missing.domain@"
+			});
+
+			this.Add(x => x.Email, new InviteUserRequest
+			{
+				TeamId = TeamId.New(),
+				Email = "@missing.username"
+			});
+		}
 	}
 }

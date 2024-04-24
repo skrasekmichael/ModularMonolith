@@ -21,7 +21,7 @@ internal sealed class UserCreatedEventHandler : IDomainEventHandler<UserCreatedD
 		{
 			UserId = domainEvent.User.Id,
 			Email = domainEvent.User.Email,
-			Name = domainEvent.User.Name
+			Name = domainEvent.User.Name,
 		};
 
 		_publisher.Publish(userCrated);

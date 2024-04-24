@@ -1,4 +1,6 @@
-﻿using TeamUp.Common.Endpoints;
+﻿using Microsoft.AspNetCore.Builder;
+
+using TeamUp.Common.Endpoints;
 
 namespace TeamUp.TeamManagement.Endpoints;
 
@@ -8,6 +10,7 @@ public sealed class TeamManagementEndpointGroup : IEndpointGroup
 	{
 		return group
 			.MapGroup<TeamEndpoints>()
-			.MapGroup<InvitationEndpoints>();
+			.MapGroup<InvitationEndpoints>()
+			.Configure(group => group.RequireAuthorization());
 	}
 }

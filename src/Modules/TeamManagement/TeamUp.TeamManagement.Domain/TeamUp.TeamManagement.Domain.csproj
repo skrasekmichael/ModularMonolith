@@ -7,7 +7,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="TeamUp.TeamManagement.Infrastructure"/>
+    <InternalsVisibleTo Include="TeamUp.TeamManagement.Infrastructure" />
   </ItemGroup>
 
 </Project>
