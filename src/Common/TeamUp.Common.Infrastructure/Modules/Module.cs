@@ -27,6 +27,7 @@ public abstract class Module<TModuleId, TDatabaseContext> : IModule
 {
 	private static readonly Type QueryType = typeof(IQuery<>);
 	private static readonly Type QueryConsumerType = typeof(QueryConsumerFacade<,>);
+	private static readonly Type QueryConsumerDefinitionType = typeof(QueryConsumerDefinition<,>);
 	private static readonly Type CommandType = typeof(ICommand);
 	private static readonly Type CommandConsumerType = typeof(CommandConsumerFacade<>);
 	private static readonly Type CommandWithResponseType = typeof(ICommand<>);
@@ -59,7 +60,9 @@ public abstract class Module<TModuleId, TDatabaseContext> : IModule
 					?? throw new InternalException($"Unexpected generic type when registering query consumer in module '{GetType().Name}'.");
 
 				var consumerType = QueryConsumerType.MakeGenericType(type, responseType);
-				cfg.AddConsumer(consumerType);
+				var consumerDefinition = QueryConsumerDefinitionType.MakeGenericType(type, responseType);
+
+				cfg.AddConsumer(consumerType, consumerDefinition);
 				continue;
 			}
 

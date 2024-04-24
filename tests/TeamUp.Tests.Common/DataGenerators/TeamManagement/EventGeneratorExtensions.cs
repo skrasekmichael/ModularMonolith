@@ -1,6 +1,9 @@
-﻿using FluentAssertions.Extensions;
+﻿using Bogus;
+
+using FluentAssertions.Extensions;
 
 using TeamUp.TeamManagement.Contracts.Events;
+using TeamUp.TeamManagement.Contracts.Events.CreateEvent;
 using TeamUp.TeamManagement.Contracts.Teams;
 using TeamUp.TeamManagement.Domain.Aggregates.Teams;
 using TeamUp.Tests.Common.Extensions;
@@ -48,4 +51,13 @@ public static class EventGeneratorExtensions
 	public static EventGenerator WithStatus(this EventGenerator generator, EventStatus status) => generator.RuleFor(e => e.Status, status);
 
 	public static EventGenerator ForTeam(this EventGenerator generator, TeamId teamId) => generator.RuleForBackingField(e => e.TeamId, teamId);
+
+	public static Faker<CreateEventRequest> WithEventType(this Faker<CreateEventRequest> generator, EventTypeId eventTypeId) => generator.RuleFor(x => x.EventTypeId, eventTypeId);
+
+	public static Faker<CreateEventRequest> WithTime(this Faker<CreateEventRequest> generator, DateTime fromUtc, DateTime toUtc)
+	{
+		return generator
+			.RuleFor(x => x.FromUtc, fromUtc.DropMicroSeconds())
+			.RuleFor(x => x.ToUtc, toUtc.DropMicroSeconds());
+	}
 }

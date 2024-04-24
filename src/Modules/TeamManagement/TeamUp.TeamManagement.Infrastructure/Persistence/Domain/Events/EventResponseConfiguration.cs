@@ -2,8 +2,9 @@
 
 using TeamUp.Common.Infrastructure.Persistence;
 using TeamUp.TeamManagement.Contracts.Events;
-using TeamUp.TeamManagement.Domain.Aggregates.Events;
 using TeamUp.TeamManagement.Domain.Aggregates.Teams;
+
+using EventResponse = TeamUp.TeamManagement.Domain.Aggregates.Events.EventResponse;
 
 namespace TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Events;
 

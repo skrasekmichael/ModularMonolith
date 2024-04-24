@@ -18,7 +18,8 @@ internal sealed class TeamEndpoints : IEndpointGroup
 				.AddEndpoint<UpdateTeamMemberRoleEndpoint>()
 				.AddEndpoint<UpdateTeamNameEndpoint>()
 				.AddEndpoint<ChangeNicknameEndpoint>()
-				.AddEndpoint<CreateEventTypeEndpoint>();
+				.AddEndpoint<CreateEventTypeEndpoint>()
+				.MapGroup<EventsEndpointGroup>();
 		});
 	}
 }
