@@ -25,12 +25,21 @@ public sealed class User : AggregateRoot<User, UserId>
 		AddDomainEvent(new UserCreatedDomainEvent(this));
 	}
 
+
 	internal static User Create(string name, string email, Password password) => new(
 		UserId.New(),
 		name,
 		email,
 		password,
 		UserState.NotActivated
+	);
+
+	internal static User Generate(string name, string email) => new(
+		UserId.New(),
+		name,
+		email,
+		new Password(),
+		UserState.Generated
 	);
 
 	public void Delete()

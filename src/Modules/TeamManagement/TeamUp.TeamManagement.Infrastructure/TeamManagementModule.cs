@@ -34,12 +34,13 @@ public sealed class TeamManagementModule : ModuleWithEndpoints<TeamManagementMod
 	public override void ConfigureServices(IServiceCollection services)
 	{
 		services
+			.AddScoped<ITeamManagementQueryContext, TeamManagementDbQueryContextFacade>()
 			.AddScoped<IUserRepository, UserRepository>()
 			.AddScoped<ITeamRepository, TeamRepository>()
 			.AddScoped<IEventRepository, EventRepository>()
+			.AddScoped<IEventDomainService, EventDomainService>()
 			.AddScoped<IInvitationRepository, InvitationRepository>()
-			.AddScoped<InvitationFactory>()
-			.AddScoped<ITeamManagementQueryContext, TeamManagementDbQueryContextFacade>()
-			.AddScoped<IEventDomainService, EventDomainService>();
+			.AddScoped<IInvitationDomainService, InvitationDomainService>()
+			.AddScoped<InvitationFactory>();
 	}
 }

@@ -1,32 +1,27 @@
 ﻿using TeamUp.Common.Application;
-using TeamUp.UserAccess.Application.Abstractions;
 using TeamUp.UserAccess.Contracts;
 using TeamUp.UserAccess.Contracts.CreateUser;
 using TeamUp.UserAccess.Domain;
 
 namespace TeamUp.UserAccess.Application;
 
-internal sealed class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, UserId>
+internal sealed class GenerateUserCommandHandler : ICommandHandler<GenerateUserCommand, UserId>
 {
 	private readonly UserFactory _userFactory;
-	private readonly IPasswordService _passwordService;
 	private readonly IUnitOfWork<UserAccessModuleId> _unitOfWork;
 
-	public RegisterUserCommandHandler(
+	public GenerateUserCommandHandler(
 		UserFactory userFactory,
-		IPasswordService passwordService,
 		IUnitOfWork<UserAccessModuleId> unitOfWork)
 	{
 		_userFactory = userFactory;
-		_passwordService = passwordService;
 		_unitOfWork = unitOfWork;
 	}
 
-	public async Task<Result<UserId>> Handle(RegisterUserCommand command, CancellationToken ct)
+	public async Task<Result<UserId>> Handle(GenerateUserCommand command, CancellationToken ct)
 	{
-		var password = _passwordService.HashPassword(command.Password);
 		return await _userFactory
-			.CreateAndAddUserAsync(command.Name, command.Email, password, ct)
+			.GenerateAndAddUserAsync(command.Name, command.Email, ct)
 			.Then(user => user.Id)
 			.TapAsync(_ => _unitOfWork.SaveChangesAsync(ct));
 	}

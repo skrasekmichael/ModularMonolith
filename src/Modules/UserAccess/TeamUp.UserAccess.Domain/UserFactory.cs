@@ -18,4 +18,14 @@ public sealed class UserFactory
 			.Then(_ => User.Create(name, email, password))
 			.Tap(_userRepository.AddUser);
 	}
+
+	public async Task<Result<User>> GenerateAndAddUserAsync(string name, string email, CancellationToken ct = default)
+	{
+		return await name
+			.Ensure(Rules.UserNameMinSize, Rules.UserNameMaxSize)
+			.ThenAsync(_ => _userRepository.ExistsUserWithConflictingEmailAsync(email, ct))
+			.Ensure(conflictingUserExists => conflictingUserExists == false, UserErrors.ConflictingEmail)
+			.Then(_ => User.Generate(name, email))
+			.Tap(_userRepository.AddUser);
+	}
 }
