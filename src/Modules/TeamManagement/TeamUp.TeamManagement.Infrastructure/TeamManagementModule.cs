@@ -39,6 +39,7 @@ public sealed class TeamManagementModule : ModuleWithEndpoints<TeamManagementMod
 			.AddScoped<IEventRepository, EventRepository>()
 			.AddScoped<IInvitationRepository, InvitationRepository>()
 			.AddScoped<InvitationFactory>()
-			.AddScoped<ITeamManagementQueryContext, TeamManagementDbQueryContextFacade>();
+			.AddScoped<ITeamManagementQueryContext, TeamManagementDbQueryContextFacade>()
+			.AddScoped<IEventDomainService, EventDomainService>();
 	}
 }
