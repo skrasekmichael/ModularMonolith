@@ -22,7 +22,6 @@ internal sealed class InvitationDomainService : IInvitationDomainService
 	private readonly ITeamRepository _teamRepository;
 	private readonly IInvitationRepository _invitationRepository;
 	private readonly IIntegrationEventPublisher<TeamManagementModuleId> _publisher;
-	private readonly IRequestClient<GenerateUserCommand> _client;
 	private readonly IDateTimeProvider _dateTimeProvider;
 
 	public InvitationDomainService(
@@ -30,14 +29,12 @@ internal sealed class InvitationDomainService : IInvitationDomainService
 		ITeamRepository teamRepository,
 		IInvitationRepository invitationRepository,
 		IIntegrationEventPublisher<TeamManagementModuleId> publisher,
-		IRequestClient<GenerateUserCommand> client,
 		IDateTimeProvider dateTimeProvider)
 	{
 		_userRepository = userRepository;
 		_teamRepository = teamRepository;
 		_invitationRepository = invitationRepository;
 		_publisher = publisher;
-		_client = client;
 		_dateTimeProvider = dateTimeProvider;
 	}
 
@@ -65,6 +62,7 @@ internal sealed class InvitationDomainService : IInvitationDomainService
 			.ToResultAsync();
 	}
 
+
 	public async Task<Result> InviteUserAsync(UserId initiatorId, TeamId teamId, string email, CancellationToken ct = default)
 	{
 		var team = await _teamRepository.GetTeamByIdAsync(teamId, ct);
@@ -76,47 +74,41 @@ internal sealed class InvitationDomainService : IInvitationDomainService
 			.Then((team, _) => team)
 			.AndAsync(team => _userRepository.GetUserByEmailAsync(email, ct))
 			.Ensure(TeamRules.InvitedUserIsNotTeamMember)
-			.ThenAsync(async (team, user) =>
+			.ThenAsync<Team, User?, (Team, string)>(async (team, user) =>
 			{
 				//generate user if user doesn't exist
 				if (user is null)
 				{
-					return await GenerateUserAsync(email, ct)
-						.Then(userId => (team, userId));
+					var message = new GenerateUserRequestCreatedIntegrationEvent
+					{
+						Email = email,
+						Name = email
+					};
+
+					_publisher.Publish(message);
+					return (team, email);
 				}
 
-				//check for whether user is already invited to the same team
+				//check whether user is already invited to the same team
 				var conflictingInvitationExists = await _invitationRepository.ExistsInvitationForUserToTeamAsync(user.Id, teamId, ct);
 				if (conflictingInvitationExists)
 				{
 					return InvitationErrors.UserIsAlreadyInvited;
 				}
 
-				return (team, user.Id);
+				return (team, user.Email);
 			})
-			.Tap((team, userId) =>
+			.Tap((team, email) =>
 			{
 				var message = new CreateInvitationRequestCreatedIntegrationEvent
 				{
 					TeamId = team.Id,
-					UserId = userId
+					Email = email
 				};
 
 				_publisher.Publish(message);
 			})
 			.ToResultAsync();
-	}
-
-	private async Task<Result<UserId>> GenerateUserAsync(string email, CancellationToken ct)
-	{
-		var message = new GenerateUserCommand
-		{
-			Email = email,
-			Name = email
-		};
-
-		var response = await _client.GetResponse<Result<UserId>>(message, ct);
-		return response.Message;
 	}
 
 	public async Task<Result> RemoveInvitationAsync(UserId initiatorId, InvitationId invitationId, CancellationToken ct = default)
