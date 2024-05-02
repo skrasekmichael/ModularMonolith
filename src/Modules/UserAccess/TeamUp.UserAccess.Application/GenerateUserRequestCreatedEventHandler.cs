@@ -5,12 +5,12 @@ using TeamUp.UserAccess.Domain;
 
 namespace TeamUp.UserAccess.Application;
 
-internal sealed class GenerateUserCommandHandler : ICommandHandler<GenerateUserCommand, UserId>
+internal sealed class GenerateUserRequestCreatedEventHandler : IIntegrationEventHandler<GenerateUserRequestCreatedIntegrationEvent>
 {
 	private readonly UserFactory _userFactory;
 	private readonly IUnitOfWork<UserAccessModuleId> _unitOfWork;
 
-	public GenerateUserCommandHandler(
+	public GenerateUserRequestCreatedEventHandler(
 		UserFactory userFactory,
 		IUnitOfWork<UserAccessModuleId> unitOfWork)
 	{
@@ -18,11 +18,10 @@ internal sealed class GenerateUserCommandHandler : ICommandHandler<GenerateUserC
 		_unitOfWork = unitOfWork;
 	}
 
-	public async Task<Result<UserId>> Handle(GenerateUserCommand command, CancellationToken ct)
+	public async Task<Result> Handle(GenerateUserRequestCreatedIntegrationEvent command, CancellationToken ct)
 	{
 		return await _userFactory
 			.GenerateAndAddUserAsync(command.Name, command.Email, ct)
-			.Then(user => user.Id)
-			.TapAsync(_ => _unitOfWork.SaveChangesAsync(ct));
+			.ThenAsync(_ => _unitOfWork.SaveChangesAsync(ct));
 	}
 }

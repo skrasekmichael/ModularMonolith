@@ -4,12 +4,12 @@ using TeamUp.Common.Contracts;
 
 namespace TeamUp.UserAccess.Contracts.CreateUser;
 
-public sealed record GenerateUserCommand : ICommand<UserId>
+public sealed record GenerateUserRequestCreatedIntegrationEvent : IIntegrationEvent
 {
 	public required string Name { get; init; }
 	public required string Email { get; init; }
 
-	public sealed class Validator : AbstractValidator<GenerateUserCommand>
+	public sealed class Validator : AbstractValidator<GenerateUserRequestCreatedIntegrationEvent>
 	{
 		public Validator()
 		{

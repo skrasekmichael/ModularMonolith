@@ -34,10 +34,10 @@ internal sealed class CreateInvitationRequestCreatedEventHandler : IIntegrationE
 
 	public async Task<Result> Handle(CreateInvitationRequestCreatedIntegrationEvent integrationEvent, CancellationToken ct)
 	{
-		var user = await _userRepository.GetUserByIdAsync(integrationEvent.UserId, ct);
+		var user = await _userRepository.GetUserByEmailAsync(integrationEvent.Email, ct);
 		if (user is null)
 		{
-			_logger.LogWarning("User {userId} is not yet created for inviting to team {teamId}.", integrationEvent.UserId, integrationEvent.TeamId);
+			_logger.LogWarning("User {userEmail} is not yet created for inviting to team {teamId}.", integrationEvent.Email, integrationEvent.TeamId);
 			return new EventualConsistencyError("TeamManagement.Users.NotFound", "User not found when inviting.");
 		}
 
@@ -60,7 +60,7 @@ internal sealed class CreateInvitationRequestCreatedEventHandler : IIntegrationE
 		{
 			if (result.Error is ConflictError error)
 			{
-				_logger.LogWarning("Invitation of user {userId} to team {teamId} probably already exist. {error}", integrationEvent.UserId, integrationEvent.TeamId, error);
+				_logger.LogWarning("Invitation of user {userEmail} to team {teamId} probably already exist. {error}", integrationEvent.Email, integrationEvent.TeamId, error);
 				return Result.Success;
 			}
 		}
