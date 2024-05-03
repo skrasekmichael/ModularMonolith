@@ -12,6 +12,7 @@ internal sealed class TeamEndpoints : IEndpointGroup
 			group
 				.AddEndpoint<CreateTeamEndpoint>()
 				.AddEndpoint<GetTeamEndpoint>()
+				.AddEndpoint<GetUserTeamsEndpoint>()
 				.AddEndpoint<DeleteTeamEndpoint>()
 				.AddEndpoint<ChangeOwnershipEndpoint>()
 				.AddEndpoint<RemoveTeamMemberEndpoint>()
