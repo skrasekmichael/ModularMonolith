@@ -43,6 +43,12 @@ namespace TeamUp.Notifications.Infrastructure.Persistence.Migrations
                     b.Property<string>("Error")
                         .HasColumnType("text");
 
+                    b.Property<int>("FailCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("NextProcessingUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime?>("ProcessedUtc")
                         .HasColumnType("timestamp with time zone");
 

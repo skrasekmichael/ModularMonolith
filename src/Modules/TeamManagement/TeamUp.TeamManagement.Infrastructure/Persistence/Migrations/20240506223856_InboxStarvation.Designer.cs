@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeamUp.TeamManagement.Infrastructure;
@@ -11,9 +12,11 @@ using TeamUp.TeamManagement.Infrastructure;
 namespace TeamUp.TeamManagement.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(TeamManagementDbContext))]
-    partial class TeamManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240506223856_InboxStarvation")]
+    partial class InboxStarvation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

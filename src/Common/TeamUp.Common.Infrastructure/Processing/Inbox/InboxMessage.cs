@@ -9,4 +9,6 @@ internal sealed record InboxMessage
 	public required string Data { get; init; }
 	public DateTime? ProcessedUtc { get; set; } = null;
 	public string? Error { get; set; } = null;
+	public int FailCount { get; set; } = 0;
+	public DateTime? NextProcessingUtc { get; set; } = null;
 }
