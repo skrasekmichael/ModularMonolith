@@ -44,7 +44,7 @@ internal sealed class InboxConsumer : IInboxConsumer
 		}
 	}
 
-	internal async Task<Type?> DispatchEventAsync(InboxMessage message, CancellationToken ct = default)
+	private async Task<Type?> TryDispatchEventAsync(InboxMessage message, CancellationToken ct = default)
 	{
 		var integrationEventHandlerType = ResolveType(message);
 		if (integrationEventHandlerType is null)
@@ -102,11 +102,32 @@ internal sealed class InboxConsumer : IInboxConsumer
 		}
 	}
 
-	internal static Task<List<InboxMessage>> GetInboxAsync(DbContext dbContext, CancellationToken ct)
+	internal async Task<Type?> DispatchEventAsync(InboxMessage message, CancellationToken ct = default)
+	{
+		var result = await TryDispatchEventAsync(message, ct);
+
+		if (result is null)
+		{
+			message.FailCount++;
+			message.NextProcessingUtc = message.FailCount switch
+			{
+				< 5 => _dateTimeProvider.UtcNow,
+				< 10 => _dateTimeProvider.UtcNow.AddMinutes(message.FailCount - 10),
+				_ => _dateTimeProvider.UtcNow.AddMinutes(message.FailCount)
+			};
+		}
+
+		return result;
+	}
+
+	internal Task<List<InboxMessage>> GetInboxAsync(DbContext dbContext, CancellationToken ct)
 	{
 		return dbContext
 			.Set<InboxMessage>()
-			.Where(msg => msg.ProcessedUtc == null)
+			.Where(msg =>
+				msg.ProcessedUtc == null && //unprocessed
+				msg.FailCount != -1 && //not marked for skipping
+				msg.NextProcessingUtc < _dateTimeProvider.UtcNow) //is scheduled for processing
 			.OrderBy(msg => msg.CreatedUtc)
 			.Take(20)
 			.ToListAsync(ct);

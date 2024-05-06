@@ -45,7 +45,8 @@ internal sealed class InboxProducer<TDatabaseContext, TModuleId> : IInboxProduce
 			CreatedUtc = _dateTimeProvider.UtcNow,
 			Assembly = type.Assembly.GetName().Name!,
 			Type = type.FullName!,
-			Data = JsonSerializer.Serialize(integrationEvent, JsonSerializerOptions)
+			Data = JsonSerializer.Serialize(integrationEvent, JsonSerializerOptions),
+			NextProcessingUtc = _dateTimeProvider.UtcNow
 		};
 
 		_dbContext.Set<InboxMessage>().Add(message);

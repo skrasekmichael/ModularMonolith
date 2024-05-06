@@ -2,22 +2,25 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using TeamUp.UserAccess.Infrastructure.Persistence;
+using TeamUp.Notifications.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace TeamUp.UserAccess.Infrastructure.Persistence.Migrations
+namespace TeamUp.Notifications.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(UserAccessDbContext))]
-    partial class UserAccessDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(NotificationsDbContext))]
+    [Migration("20240506223822_InboxStarvation")]
+    partial class InboxStarvation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("UserAccess")
+                .HasDefaultSchema("Notifications")
                 .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -58,7 +61,7 @@ namespace TeamUp.UserAccess.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InboxMessages", "UserAccess");
+                    b.ToTable("InboxMessages", "Notifications");
                 });
 
             modelBuilder.Entity("TeamUp.Common.Infrastructure.Processing.Outbox.OutboxMessage", b =>
@@ -90,43 +93,7 @@ namespace TeamUp.UserAccess.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OutboxMessages", "UserAccess");
-                });
-
-            modelBuilder.Entity("TeamUp.UserAccess.Domain.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<byte[]>("Password")
-                        .IsRequired()
-                        .HasColumnType("bytea");
-
-                    b.Property<uint>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.Property<int>("State")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.ToTable("Users", "UserAccess");
+                    b.ToTable("OutboxMessages", "Notifications");
                 });
 #pragma warning restore 612, 618
         }

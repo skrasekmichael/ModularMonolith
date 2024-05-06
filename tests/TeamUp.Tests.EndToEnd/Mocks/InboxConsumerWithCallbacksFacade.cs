@@ -24,7 +24,7 @@ internal sealed class InboxConsumerWithCallbacksFacade : IInboxConsumer
 		_logger.LogInformation("Retrieving inbox messages.");
 
 		//get unpublished integration events
-		var messages = await InboxConsumer.GetInboxAsync(dbContext, ct);
+		var messages = await _inboxConsumer.GetInboxAsync(dbContext, ct);
 
 		_logger.LogInformation("Publishing inbox messages.");
 
