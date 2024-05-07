@@ -17,10 +17,11 @@ public interface IModule
 
 	public void ConfigureServices(IServiceCollection services);
 	public void ConfigureHealthChecks(IHealthChecksBuilder healthChecks);
+	public void ConfigureJobs(IServiceCollectionQuartzConfigurator configurator);
 	public void RegisterRequestConsumers(IBusRegistrationConfigurator cfg);
 	public void RegisterEventConsumers(IServiceCollection services, IBusRegistrationConfigurator cfg);
 	public void ConfigureEssentialServices(IServiceCollection services, IHealthChecksBuilder healthChecks);
-	public void ConfigureJobs(IServiceCollectionQuartzConfigurator configurator);
+	public void ConfigureEssentialJobs(IServiceCollectionQuartzConfigurator configurator);
 
 	internal abstract DbContext CreateDatabaseContext(string connectionString);
 	internal (string Name, string Schema) GetMigrationTable();

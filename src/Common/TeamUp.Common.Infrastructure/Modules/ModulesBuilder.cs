@@ -87,6 +87,7 @@ public sealed class ModulesBuilder : IEnumerable<IModule>
 		{
 			foreach (var module in _modules)
 			{
+				module.ConfigureEssentialJobs(configurator);
 				module.ConfigureJobs(configurator);
 			}
 		});

@@ -113,14 +113,14 @@ public sealed class ModuleDependencyTests : BaseArchitectureTests
 
 	[Theory]
 	[MemberData(nameof(ModulesData))]
-	public void EachModulesInfrastructureLayer_Should_DependOnlyOn_CommonInfrastructure_Or_CommonDomain_Or_CommonContracts_Or_ModulesAssemblies_Or_ContractsOfModules(IModule module)
+	public void EachModulesInfrastructureLayer_Should_DependOnlyOn_CommonInfrastructure_Or_CommonApplication_Or_CommonDomain_Or_CommonContracts_Or_ModulesAssemblies_Or_ContractsOfModules(IModule module)
 	{
 		var assemblies = GetAllAssemblies();
 		var infrastructureAssembly = module.GetLayer(INFRASTRUCTURE_LAYER);
 
 		var allowedAssemblies = Modules
 			.GetLayerAssemblies(CONTRACTS_LAYER)
-			.With(CommonInfrastructureAssembly, CommonDomainAssembly, CommonContractsAssembly)
+			.With(CommonInfrastructureAssembly, CommonApplicationAssembly, CommonDomainAssembly, CommonContractsAssembly)
 			.With(module.Assemblies);
 
 		var failingTypes = Types.InAssembly(infrastructureAssembly)

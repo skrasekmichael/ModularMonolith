@@ -36,7 +36,9 @@ public abstract class Module<TModuleId, TDatabaseContext> : IModule
 	private static readonly Type IntegrationEventConsumerType = typeof(IntegrationEventConsumerFacade<,,>);
 
 	private static readonly JobKey ProcessOutboxJobKey = new(TModuleId.ModuleName + "Outbox");
+	private static readonly JobKey CleanProcessedOutboxMessagesJobKey = new(TModuleId.ModuleName + "CleanOutbox");
 	private static readonly JobKey ProcessInboxJobKey = new(TModuleId.ModuleName + "Inbox");
+	private static readonly JobKey CleanProcessedInboxMessagesJobKey = new(TModuleId.ModuleName + "CleanInbox");
 
 	public abstract Assembly ContractsAssembly { get; }
 	public abstract Assembly ApplicationAssembly { get; }
@@ -44,6 +46,7 @@ public abstract class Module<TModuleId, TDatabaseContext> : IModule
 
 	public abstract void ConfigureServices(IServiceCollection services);
 	public virtual void ConfigureHealthChecks(IHealthChecksBuilder healthChecks) { }
+	public virtual void ConfigureJobs(IServiceCollectionQuartzConfigurator configurator) { }
 
 	public void RegisterRequestConsumers(IBusRegistrationConfigurator cfg)
 	{
@@ -118,11 +121,14 @@ public abstract class Module<TModuleId, TDatabaseContext> : IModule
 
 		healthChecks.AddDbContextCheck<TDatabaseContext>();
 
-		services.AddScoped<IUnitOfWork<TModuleId>, UnitOfWork<TDatabaseContext, TModuleId>>();
-		services.AddScoped<IIntegrationEventPublisher<TModuleId>, IntegrationEventPublisher<TDatabaseContext, TModuleId>>();
-		services.AddScoped<IInboxProducer<TModuleId>, InboxProducer<TDatabaseContext, TModuleId>>();
-		services.AddScoped<IProcessOutboxMessagesJob<TModuleId>, ProcessOutboxMessagesJob<TDatabaseContext, TModuleId>>();
-		services.AddScoped<IProcessInboxMessagesJob<TModuleId>, ProcessInboxMessagesJob<TDatabaseContext, TModuleId>>();
+		services
+			.AddScoped<IUnitOfWork<TModuleId>, UnitOfWork<TDatabaseContext, TModuleId>>()
+			.AddScoped<IIntegrationEventPublisher<TModuleId>, IntegrationEventPublisher<TDatabaseContext, TModuleId>>()
+			.AddScoped<IInboxProducer<TModuleId>, InboxProducer<TDatabaseContext, TModuleId>>()
+			.AddScoped<IProcessOutboxMessagesJob<TModuleId>, ProcessOutboxMessagesJob<TDatabaseContext, TModuleId>>()
+			.AddScoped<ICleanProcessedOutboxMessagesJob<TModuleId>, CleanProcessedOutboxMessagesJob<TDatabaseContext, TModuleId>>()
+			.AddScoped<IProcessInboxMessagesJob<TModuleId>, ProcessInboxMessagesJob<TDatabaseContext, TModuleId>>()
+			.AddScoped<ICleanProcessedInboxMessagesJob<TModuleId>, CleanProcessedInboxMessagesJob<TDatabaseContext, TModuleId>>();
 	}
 
 	(string Name, string Schema) IModule.GetMigrationTable() => DatabaseUtils.GetMigrationsTable<TDatabaseContext, TModuleId>();
@@ -132,7 +138,7 @@ public abstract class Module<TModuleId, TDatabaseContext> : IModule
 	public DbContext GetDatabaseContext<TScope>(TScope scope) where TScope : IServiceScope =>
 		scope.ServiceProvider.GetRequiredService<TDatabaseContext>();
 
-	public void ConfigureJobs(IServiceCollectionQuartzConfigurator configurator)
+	public void ConfigureEssentialJobs(IServiceCollectionQuartzConfigurator configurator)
 	{
 		configurator
 			.AddJob<IProcessOutboxMessagesJob<TModuleId>>(ProcessOutboxJobKey)
@@ -151,6 +157,24 @@ public abstract class Module<TModuleId, TDatabaseContext> : IModule
 					.ForJob(ProcessInboxJobKey)
 					.WithSimpleSchedule(schedule => schedule
 						.WithIntervalInSeconds(2)
+						.RepeatForever());
+			})
+			.AddJob<ICleanProcessedOutboxMessagesJob<TModuleId>>(CleanProcessedOutboxMessagesJobKey)
+			.AddTrigger(trigger =>
+			{
+				trigger
+					.ForJob(CleanProcessedOutboxMessagesJobKey)
+					.WithSimpleSchedule(schedule => schedule
+						.WithIntervalInMinutes(5)
+						.RepeatForever());
+			})
+			.AddJob<ICleanProcessedInboxMessagesJob<TModuleId>>(CleanProcessedInboxMessagesJobKey)
+			.AddTrigger(trigger =>
+			{
+				trigger
+					.ForJob(CleanProcessedInboxMessagesJobKey)
+					.WithSimpleSchedule(schedule => schedule
+						.WithIntervalInHours(23)
 						.RepeatForever());
 			});
 	}
