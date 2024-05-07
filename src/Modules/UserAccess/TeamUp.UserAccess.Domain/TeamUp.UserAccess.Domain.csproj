@@ -12,4 +12,8 @@
     <Using Include="RailwayResult.FunctionalExtensions" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="TeamUp.UserAccess.Infrastructure"/>
+  </ItemGroup>
+
 </Project>

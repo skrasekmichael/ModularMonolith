@@ -2,12 +2,15 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Quartz;
+
 using TeamUp.Common.Infrastructure;
 using TeamUp.Common.Infrastructure.Modules;
 using TeamUp.UserAccess.Application.Abstractions;
 using TeamUp.UserAccess.Contracts;
 using TeamUp.UserAccess.Domain;
 using TeamUp.UserAccess.Endpoints;
+using TeamUp.UserAccess.Infrastructure.Jobs;
 using TeamUp.UserAccess.Infrastructure.Persistence;
 using TeamUp.UserAccess.Infrastructure.Services;
 
@@ -35,6 +38,22 @@ public sealed class UserAccessModule : ModuleWithEndpoints<UserAccessModuleId, U
 			.AddSingleton<ITokenService, JwtTokenService>()
 			.AddScoped<IUserAccessQueryContext, UserAccessDbQueryContextFacade>()
 			.AddScoped<IUserRepository, UserRepository>()
-			.AddScoped<UserFactory>();
+			.AddScoped<UserFactory>()
+			.AddScoped<ICleanExpiredAccountsJob, CleanExpiredAccountsJob>();
+	}
+
+	public override void ConfigureJobs(IServiceCollectionQuartzConfigurator configurator)
+	{
+		var cleanExpiredAccountsJobKey = new JobKey(nameof(ICleanExpiredAccountsJob));
+		configurator
+			.AddJob<ICleanExpiredAccountsJob>(cleanExpiredAccountsJobKey)
+			.AddTrigger(trigger =>
+			{
+				trigger
+					.ForJob(cleanExpiredAccountsJobKey)
+					.WithSimpleSchedule(schedule => schedule
+						.WithIntervalInHours(23)
+						.RepeatForever());
+			});
 	}
 }

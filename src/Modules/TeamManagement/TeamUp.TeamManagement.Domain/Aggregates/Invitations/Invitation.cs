@@ -1,4 +1,6 @@
-﻿using TeamUp.Common.Domain;
+﻿using System.Linq.Expressions;
+
+using TeamUp.Common.Domain;
 using TeamUp.TeamManagement.Contracts.Invitations;
 using TeamUp.TeamManagement.Contracts.Teams;
 using TeamUp.UserAccess.Contracts;
@@ -7,7 +9,7 @@ namespace TeamUp.TeamManagement.Domain.Aggregates.Invitations;
 
 public sealed class Invitation : AggregateRoot<Invitation, InvitationId>
 {
-	private const int InvitationDTL = 4; //days to live
+	internal static readonly TimeSpan InvitationTTL = TimeSpan.FromDays(4);
 
 	public UserId RecipientId { get; }
 	public TeamId TeamId { get; }
@@ -25,5 +27,10 @@ public sealed class Invitation : AggregateRoot<Invitation, InvitationId>
 		CreatedUtc = createdUtc;
 	}
 
-	public bool HasExpired(DateTime utcNow) => utcNow - CreatedUtc >= TimeSpan.FromDays(InvitationDTL);
+	public bool HasExpired(DateTime utcNow) => utcNow - CreatedUtc >= InvitationTTL;
+
+	internal static Expression<Func<Invitation, bool>> HasExpiredExpression(DateTime utcNow)
+	{
+		return invitation => utcNow - invitation.CreatedUtc >= InvitationTTL;
+	}
 }

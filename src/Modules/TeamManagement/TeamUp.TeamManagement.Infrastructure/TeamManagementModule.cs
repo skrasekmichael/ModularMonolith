@@ -2,6 +2,8 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Quartz;
+
 using TeamUp.Common.Infrastructure.Modules;
 using TeamUp.TeamManagement.Application;
 using TeamUp.TeamManagement.Contracts;
@@ -10,6 +12,7 @@ using TeamUp.TeamManagement.Domain.Aggregates.Invitations;
 using TeamUp.TeamManagement.Domain.Aggregates.Teams;
 using TeamUp.TeamManagement.Domain.Aggregates.Users;
 using TeamUp.TeamManagement.Endpoints;
+using TeamUp.TeamManagement.Infrastructure.Jobs;
 using TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Events;
 using TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Invitations;
 using TeamUp.TeamManagement.Infrastructure.Persistence.Domain.Teams;
@@ -41,6 +44,22 @@ public sealed class TeamManagementModule : ModuleWithEndpoints<TeamManagementMod
 			.AddScoped<IEventDomainService, EventDomainService>()
 			.AddScoped<IInvitationRepository, InvitationRepository>()
 			.AddScoped<IInvitationDomainService, InvitationDomainService>()
-			.AddScoped<InvitationFactory>();
+			.AddScoped<InvitationFactory>()
+			.AddScoped<ICleanExpiredInvitationsJob, CleanExpiredInvitationsJob>();
+	}
+
+	public override void ConfigureJobs(IServiceCollectionQuartzConfigurator configurator)
+	{
+		var cleanExpiredInvitationsJobKey = new JobKey(nameof(ICleanExpiredInvitationsJob));
+		configurator
+			.AddJob<ICleanExpiredInvitationsJob>(cleanExpiredInvitationsJobKey)
+			.AddTrigger(trigger =>
+			{
+				trigger
+					.ForJob(cleanExpiredInvitationsJobKey)
+					.WithSimpleSchedule(schedule => schedule
+						.WithIntervalInHours(23)
+						.RepeatForever());
+			});
 	}
 }
