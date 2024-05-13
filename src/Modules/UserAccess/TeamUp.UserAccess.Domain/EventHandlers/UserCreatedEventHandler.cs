@@ -30,7 +30,7 @@ internal sealed class UserCreatedEventHandler : IDomainEventHandler<UserCreatedD
 		{
 			Email = domainEvent.User.Email,
 			Subject = "Activation Email",
-			Message = "Activate account!"
+			Message = $"Activate your account! /api/v1/users/{domainEvent.User.Id.Value}/activate"
 		};
 
 		_publisher.Publish(emailCreated);
