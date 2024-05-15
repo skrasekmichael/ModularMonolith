@@ -27,6 +27,7 @@ internal sealed class GetUserTeamsQueryHandler : IQueryHandler<GetUserTeamsQuery
 			{
 				TeamId = team.Id,
 				Name = team.Name,
+				NumberOfTeamMembers = team.NumberOfMembers
 			})
 			.ToListAsync(ct);
 
