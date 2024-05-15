@@ -10,5 +10,6 @@ public sealed class EventSlimResponse
 	public required EventStatus Status { get; init; }
 	public required TimeSpan MeetTime { get; init; }
 	public required TimeSpan ReplyClosingTimeBeforeMeetTime { get; init; }
+	public required EventResponseResponse? InitiatorResponse { get; init; }
 	public required List<ReplyCountResponse> ReplyCount { get; init; }
 }

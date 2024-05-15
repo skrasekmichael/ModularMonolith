@@ -58,6 +58,7 @@ public sealed class GetUserTeamsTests(AppFixture app) : TeamTests(app)
 		{
 			TeamId = team.Id,
 			Name = team.Name,
+			NumberOfTeamMembers = team.NumberOfMembers
 		});
 
 		var otherTeam = TeamGenerators.Team.WithOneOwner(members.First());
