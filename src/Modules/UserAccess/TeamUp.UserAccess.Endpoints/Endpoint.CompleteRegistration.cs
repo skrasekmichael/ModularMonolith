@@ -7,32 +7,31 @@ using Microsoft.AspNetCore.Routing;
 
 using TeamUp.Common.Endpoints;
 using TeamUp.UserAccess.Contracts;
-using TeamUp.UserAccess.Contracts.DeleteUser;
+using TeamUp.UserAccess.Contracts.CompleteRegistration;
 
 namespace TeamUp.UserAccess.Endpoints;
 
-internal sealed class DeleteUserEndpoint : IEndpoint
+public sealed class CompleteRegistrationEndpoint : IEndpoint
 {
 	public void MapEndpoint(RouteGroupBuilder group)
 	{
-		group.MapDelete("/", DeleteUserAsync)
+		group.MapPost("/{userId:guid}/generated/complete", ActivateAccountAsync)
 			.Produces(StatusCodes.Status200OK)
-			.ProducesProblem(StatusCodes.Status401Unauthorized)
-			.ProducesProblem(StatusCodes.Status403Forbidden)
+			.ProducesProblem(StatusCodes.Status400BadRequest)
 			.ProducesProblem(StatusCodes.Status404NotFound)
-			.WithName(nameof(DeleteUserEndpoint))
+			.WithName(nameof(CompleteRegistrationEndpoint))
 			.MapToApiVersion(1);
 	}
 
-	private async Task<IResult> DeleteUserAsync(
-		[FromServices] ISender sender,
+	private async Task<IResult> ActivateAccountAsync(
+		[FromRoute] Guid userId,
 		[FromHeader(Name = UserConstants.HTTP_HEADER_PASSWORD)] string password,
-		HttpContext httpContext,
+		[FromServices] ISender sender,
 		CancellationToken ct)
 	{
-		var command = new DeleteUserCommand
+		var command = new CompleteRegistrationCommand
 		{
-			InitiatorId = httpContext.GetCurrentUserId(),
+			UserId = UserId.FromGuid(userId),
 			Password = password
 		};
 

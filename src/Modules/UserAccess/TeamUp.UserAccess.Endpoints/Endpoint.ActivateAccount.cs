@@ -17,6 +17,7 @@ internal sealed class ActivateAccountEndpoint : IEndpoint
 	{
 		group.MapPost("/{userId:guid}/activate", ActivateAccountAsync)
 			.Produces(StatusCodes.Status200OK)
+			.ProducesProblem(StatusCodes.Status400BadRequest)
 			.ProducesProblem(StatusCodes.Status404NotFound)
 			.WithName(nameof(ActivateAccountEndpoint))
 			.MapToApiVersion(1);

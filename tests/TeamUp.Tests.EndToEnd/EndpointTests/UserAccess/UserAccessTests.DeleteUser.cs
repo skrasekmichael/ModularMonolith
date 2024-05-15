@@ -84,7 +84,7 @@ public sealed class DeleteUserTests(AppFixture app) : UserAccessTests(app)
 		});
 
 		Authenticate(targetUserUA);
-		Client.DefaultRequestHeaders.Add(UserConstants.HTTP_HEADER_CONFIRM_PASSWORD, rawPassword);
+		Client.DefaultRequestHeaders.Add(UserConstants.HTTP_HEADER_PASSWORD, rawPassword);
 
 		//act
 		var response = await Client.DeleteAsync(URL);
@@ -195,7 +195,7 @@ public sealed class DeleteUserTests(AppFixture app) : UserAccessTests(app)
 		});
 
 		Authenticate(targetUserUA);
-		Client.DefaultRequestHeaders.Add(UserConstants.HTTP_HEADER_CONFIRM_PASSWORD, rawPassword);
+		Client.DefaultRequestHeaders.Add(UserConstants.HTTP_HEADER_PASSWORD, rawPassword);
 
 		//act
 		var response = await Client.DeleteAsync(URL);
@@ -312,7 +312,7 @@ public sealed class DeleteUserTests(AppFixture app) : UserAccessTests(app)
 		});
 
 		Authenticate(targetUserUA);
-		Client.DefaultRequestHeaders.Add(UserConstants.HTTP_HEADER_CONFIRM_PASSWORD, rawPassword);
+		Client.DefaultRequestHeaders.Add(UserConstants.HTTP_HEADER_PASSWORD, rawPassword);
 
 		//act
 		var response = await Client.DeleteAsync(URL);
@@ -384,7 +384,7 @@ public sealed class DeleteUserTests(AppFixture app) : UserAccessTests(app)
 		});
 
 		Authenticate(targetUser);
-		Client.DefaultRequestHeaders.Add(UserConstants.HTTP_HEADER_CONFIRM_PASSWORD, "incorrect password");
+		Client.DefaultRequestHeaders.Add(UserConstants.HTTP_HEADER_PASSWORD, "incorrect password");
 
 		//act
 		var response = await Client.DeleteAsync(URL);
@@ -410,7 +410,7 @@ public sealed class DeleteUserTests(AppFixture app) : UserAccessTests(app)
 		});
 
 		Authenticate(targetUser);
-		Client.DefaultRequestHeaders.Add(UserConstants.HTTP_HEADER_CONFIRM_PASSWORD, "whatever password");
+		Client.DefaultRequestHeaders.Add(UserConstants.HTTP_HEADER_PASSWORD, "whatever password");
 
 		//act
 		var response = await Client.DeleteAsync(URL);

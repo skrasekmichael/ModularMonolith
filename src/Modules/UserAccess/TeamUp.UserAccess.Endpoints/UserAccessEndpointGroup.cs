@@ -13,7 +13,8 @@ public sealed class UserAccessEndpointGroup : IEndpointGroup
 				.AddEndpoint<RegisterUserEndpoint>()
 				.AddEndpoint<LoginEndpoint>()
 				.AddEndpoint<DeleteUserEndpoint>()
-				.AddEndpoint<ActivateAccountEndpoint>();
+				.AddEndpoint<ActivateAccountEndpoint>()
+				.AddEndpoint<CompleteRegistrationEndpoint>();
 		});
 	}
 }

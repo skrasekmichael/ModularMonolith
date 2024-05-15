@@ -36,6 +36,7 @@ public sealed class UserAccessModule : ModuleWithEndpoints<UserAccessModuleId, U
 		services
 			.AddSingleton<IPasswordService, PasswordService>()
 			.AddSingleton<ITokenService, JwtTokenService>()
+			.AddSingleton<IClientUrlGenerator, ClientUrlGenerator>()
 			.AddScoped<IUserAccessQueryContext, UserAccessDbQueryContextFacade>()
 			.AddScoped<IUserRepository, UserRepository>()
 			.AddScoped<UserFactory>()
