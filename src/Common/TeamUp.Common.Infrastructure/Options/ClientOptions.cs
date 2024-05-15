@@ -8,4 +8,10 @@ public sealed class ClientOptions : IAppOptions
 
 	[Required]
 	public required string Url { get; init; }
+
+	[Required]
+	public required string ActivateAccountUrl { get; init; }
+
+	[Required]
+	public required string CompleteAccountRegistrationUrl { get; init; }
 }

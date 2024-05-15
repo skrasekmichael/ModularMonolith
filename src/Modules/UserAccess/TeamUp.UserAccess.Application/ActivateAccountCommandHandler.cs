@@ -21,8 +21,7 @@ internal sealed class ActivateAccountCommandHandler : ICommandHandler<ActivateAc
 		var user = await _userRepository.GetUserByIdAsync(command.UserId, ct);
 		return await user
 			.EnsureNotNull(UserErrors.UserNotFound)
-			.Tap(user => user.Activate())
-			.TapAsync(_ => _unitOfWork.SaveChangesAsync(ct))
-			.ToResultAsync();
+			.Then(user => user.Activate())
+			.TapAsync(() => _unitOfWork.SaveChangesAsync(ct));
 	}
 }

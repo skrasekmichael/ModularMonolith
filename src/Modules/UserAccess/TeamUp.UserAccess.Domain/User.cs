@@ -37,10 +37,33 @@ public sealed class User : AggregateRoot<User, UserId>
 		AddDomainEvent(new UserDeletedDomainEvent(this));
 	}
 
-	public void Activate()
+	public Result Activate()
 	{
+		if (State == UserState.Generated)
+		{
+			return UserErrors.CannotActivateGeneratedAccount;
+		}
+		else if (State == UserState.Activated)
+		{
+			return UserErrors.AccountAlreadyActivated;
+		}
+
 		State = UserState.Activated;
 		AddDomainEvent(new UserActivatedDomainEvent(this));
+		return Result.Success;
+	}
+
+	public Result CompleteGeneratedRegistration(Password password)
+	{
+		if (State != UserState.Generated)
+		{
+			return UserErrors.CannotCompleteRegistrationOfNonGeneratedAccount;
+		}
+
+		Password = password;
+		State = UserState.Activated;
+
+		return Result.Success;
 	}
 
 	internal static Expression<Func<User, bool>> AccountHasExpiredExpression(DateTime utcNow)
